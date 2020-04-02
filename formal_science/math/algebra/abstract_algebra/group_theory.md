@@ -31,8 +31,8 @@ With the listed four conditions, a group is a well-structed set that with fine p
 
 1. **Elimination Property** of left operation. If $x\cdot a = x\cdot b$ , then $a = b$.
 
-    > Proof. Left multiple $x^{-1}$ for both sides.
-    > $$
+	> Proof. Left multiple $x^{-1}$ for both sides.
+	> $$
     > \begin{align}
     > x\cdot a &= x\cdot b \\
     > x^{-1}\cdot x \cdot a &= x^{-1}\cdot x\cdot b \\
