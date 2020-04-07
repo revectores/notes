@@ -1,8 +1,8 @@
 # Python Data Structure
 
-### 1. List
+### 2.  Iterator functions
 
-##### # List Iterator: `map`, `filter`, `reduce`
+##### # Iterator: `map`, `filter`, `reduce`
 
 The functional-style map and filter keyword have more elegant and pythonic implementation in python as **list compenhension**, so its no necessary to use them actually. While reduce function is pretty useful indeed.
 
