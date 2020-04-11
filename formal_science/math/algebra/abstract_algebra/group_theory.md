@@ -6,7 +6,7 @@ $$
 
 ### 1. Group
 
-##### # Definition
+##### Definition
 
 A non-empty set $S$ with its **combinative** binary operation called **SemiGroup**. If there's identical element in semigroup, it's a **Monoid**. Monoid with all the elements reversible is a **Group**.
 
@@ -16,20 +16,26 @@ Formally, a group, with binary operation $\cdot$, is restricted by four conditio
 
 1. For any element $x, y\in G$, $x\cdot y\in G$.
 2. For any element $x, y, z\in G$, $(x\cdot y)\cdot z = x\cdot (y\cdot z)$.
-3. There exists an identical element $e\in G$ which makes $e\cdot x = x$ for all $x\in G$.
-4. There exists an reverse element $x^{-1}\in G$ which makes $x^{-1}\cdot x = e$ for all $x\in G$
+3. There exists an **identical element** $e\in G$ which makes $e\cdot x = x$ for all $x\in G$.
+4. There exists an **reverse element** $x^{-1}\in G$ which makes $x^{-1}\cdot x = e$ for all $x\in G$
 
-Notice that by definition the identical $e$ and reverse element is left-operated with element $x$.
+Notice that by definition the identical $e$ and reverse element is left-operated with element $x$ traditionally, though we'll prove that the opposite side is equivlent for group.
+
+Furthermore, if the operation equiped is also commutative, the group is called **additive** or **Abelian**, and **additive notation** is proposed if the context is proper:
+
+1. The operation is denoted as $+$ instead of $\times$.
+2. The identical element is denoted as $0$ instead of $1$.
+3. The reverse element is denoted as $-x$ instead of $x^{-1}$.
+
+Particularly in the study of ring, the one operation that is commutative almos t always use the additive notation. 
 
 
 
-##### # Property
+##### Property
 
-With the listed four conditions, a group is a well-structed set that with fine properties:
+With the four restrictions listed above, a group is such a well-structed structure with nice properties:
 
-
-
-1. **Elimination Property** of left operation. If $x\cdot a = x\cdot b$ , then $a = b$.
+1. **Left Elimination Property** of left operation. If $x\cdot a = x\cdot b$ , then $a = b$.
 
 	> Proof. Left multiple $x^{-1}$ for both sides.
 	> $$
@@ -42,17 +48,19 @@ With the listed four conditions, a group is a well-structed set that with fine p
     > \end{align}
     > $$
 
-    As noticed, this is not a simple property, the proof uses all of the restrictions of a group to make the simple elimination possible.
-
-
+   As noticed, this is not a simple property, the proof uses all of the restrictions of a group to make the simple elimination possible, hence the elimination law is not held for the general monoid.
+   
+   
 
 2. If $x\cdot x = x$, then $x = e$. This is the specical case of the elimination property, you can multiple $x^{-1}$ to prove it.
 
+    This property gives an important rule to tell if an element is the identical: just simply square it, and check if the result is still itself. No more element involved.
 
 
-3. Symmetric reverse element: If $x^{-1}$ is the reversed element of $x$, so $x$ is the reverse of $x^{-1}$, which indicates $x^{-1}\cdot x = x\cdot x^{-1} = e$
 
-	> Proof. Consider use the property (2) above, we try to prove that $(x\cdot x^{-1})(x\cdot x^{-1}) = (x\cdot x^{-1})$.
+3. **Symmetric reverse element**: If $x^{-1}$ is the reversed element of $x$, so $x$ is the reverse of $x^{-1}$, which indicates $x^{-1}\cdot x = x\cdot x^{-1} = e$
+
+	> Proof. To prove that something is an element, we try to use property(2), that is, square it and check if it returns the input.
 	>
 	> $$
 	> (x\cdot x^{-1})\cdot(x\cdot x^{-1}) = x\cdot (x^{-1}\cdot x)\cdot x^{-1} = x\cdot x^{-1}
@@ -70,7 +78,7 @@ With the listed four conditions, a group is a well-structed set that with fine p
 
 
 
-4. Identical element commutative. $x\cdot e = e\cdot x = x$
+4. Identical element commutativity. $x\cdot e = e\cdot x = x$
 
 	> Proof.
 	> 
@@ -80,7 +88,7 @@ With the listed four conditions, a group is a well-structed set that with fine p
 
 
 
-5. There's only one reverse element of $x$.
+5. There's only one reverse element of any $x\in G$.
 
 	> Proof. Assume there's another reverse element $x'$ for $x$.
 	>
@@ -96,9 +104,9 @@ With the listed four conditions, a group is a well-structed set that with fine p
 
 
 
-6. There's only one identical element of $x$.
+6. There's only one identical element of any $x\in G$.
 
-	> Proof. Assume there's another identical element notes as `e'` that statifies
+	> Proof. Assume there's another identical element notes as $e'$ that statifies
 	> 
 	> $$
 	> e'\cdot x = e\cdot x
@@ -125,13 +133,15 @@ With the listed four conditions, a group is a well-structed set that with fine p
 
 
 
-##### # Example
+##### Example
 
-All permutations on a set, with the permutation composition, construct a **symmetric** group.
+All permutations on a set, equiped with the permutation composition, construct a **symmetric** group.
 
-The set $\Z, \Q, \R, \C$ with addition operation constructs the additive abelian group, this can be generalize to the general $m\times n$ dimensional vector and matrix addition operation, where the elements are defined above **ring**.
+The set $\Z, \Q, \R, \C$ equiped with addition operation constructs abelian group.
 
-To make the ring with multiplication operation also constructs group we need to substract $0$ from them: $\Q-\{0\}, \R-\{0\}, \C-\{0\}$. Notice that $\Z - \{0\}$ still cannot constructs group since the reverse of those n where $|n|>1$ does not exists.
+To make the ring equiped with multiplication operation also constructs group we need to substract $0$ from them: $\Q^{\times}=\Q-\{0\}, \R^{\times}=\R-\{0\}, \C^{\times}=\C-\{0\}$. Notice that $\Z^{\times}=\Z - \{0\}$ still cannot constructs group since the reverse of those $n\neq\pm1$ does not hold.
+
+It's obvious that to the general $m\times n$ dimensional vector/matrix equiped with the normal entry-wise addition operation above any group also constructs a group.
 
 Define $M_n(\R)$ as the set of all $n\times n$ real matrix, and $\GL(n, \R)$ is a subset of $M_n(\R)$ which contains the reversible parts.
 
@@ -139,50 +149,7 @@ As mentioned above, the $M_n(\R)$ with the matrix addition constructs a group. B
 
 
 
-##### # Subgroup
-
-If the subset $H\sub G$ meets
-
-1. $1\in H$.
-
-2. H is closed under the operation $\cdot$ of group $G$.
-
-3. for any $x\in H$, $x^{-1}\in H$.
-
-Here we don't mention about the associvity since it is directly ensured by the group $G$. Notice that the condition 1 is necessary to make sure that the subgroup is nonempty.
-
-The proper subgroup is those $H\neq G$, and nontrivial group is those $H\neq\{1\}$.
-
-As a shortcut for proving the subgroup, we assert that $H$ is a subgroup **iff** it's nonempty and for any $x, y\in H$, $xy^{-1}\in H$.
-
-> Proof. ($\Rightarrow$) If $H$ is a subgroup, it's obvious that $y^{-1}\in H$, hence $xy^{-1}\in H$.
->
-> ($\Leftarrow$) We're required to prove the three conditions of subgroup.
->
-> (1) Let $y = x$, $xy^{-1} = xx^{-1} = 1$, so $1\in H$.
->
-> (3) Based on (1), let $x = 1$, $xy^{-1} = y^{-1}\in G$.
->
-> (2) Based on (3), let $y = y^{-1}$, $xy^{-1} = x(y^{-1})^{-1} = xy\in G$.
->
-> This concludes that $H$ is the subgroup of $G$.
-
-Although its tedious and hard to prove the subgroup in general group, while for finite group $G$, the subset $H\sub G$ is only required **closed** to be a subgroup. This is caused by the well property of finite group, since there must be at least one element that the exponent of it will eventually "falls into itself".
-
-> Proof. Since $H\neq \varnothing$, assume that $a\in H$, hence $a^n\in H$ for all the $n\ge0$ according to the closed conditionof $H$.
->
-> In the sequence of exponent of $a$, there must be at least two integer $i<j$ which makes $a^j = a^i$, since the element number of $H\sub G$ is finite.
->
-> This results in $a^{j-i} = a^{i-i} = a^0 = 1 \in H$, which ensures that the identical element is in $H$.
->
-> Besides, since $j>i$, $j-i-1\ge0$, $a^{-1} = a^{j-i-1}\in H$.
->
-> Hence the set $H$ is the subgroup of $G$.
-
-
-
-
-##### # Cyclic Group
+##### Power of Element
 
 We define the $n\in\Z$ exponent of element $x\in G$ recursively:
 
@@ -214,7 +181,63 @@ If there's one $k\ge1$ that makes $a^k = 1$, the smallest $k$ is defined as the 
 
 
 
+##### Generated Group
 
+
+
+### 2. Subgroup
+
+##### Definition
+
+If the subset $H\sub G$ meets
+
+1. $1\in H$.
+
+2. H is closed under the operation $\cdot$ of group $G$.
+
+3. for any $x\in H$, $x^{-1}\in H$.
+
+We define the subset $H$ is a **subgroup** of $G$. Here we don't mention about the associvity since it is ensured by the group $G$. Notice that the condition (1) is necessary to avoid $H=\varnothing$.
+
+The **proper subgroup** is those $H\neq G$, and **nontrivial group** is those $H\neq\{1\}$.
+
+As a shortcut for proving the subgroup, we assert that $H$ is a subgroup **iff** it's nonempty and for any $x, y\in H$, $xy^{-1}\in H$.
+
+> Proof. ($\Rightarrow$) If $H$ is a subgroup, it's obvious that $y^{-1}\in H$, hence $xy^{-1}\in H$.
+>
+> ($\Leftarrow$) We're required to prove the three conditions of subgroup.
+>
+> (1) Let $y = x$, $xy^{-1} = xx^{-1} = 1$, so $1\in H$.
+>
+> (3) Based on (1), let $x = 1$, $xy^{-1} = y^{-1}\in G$.
+>
+> (2) Based on (3), let $y = y^{-1}$, $xy^{-1} = x(y^{-1})^{-1} = xy\in G$.
+>
+> This concludes that $H$ is the subgroup of $G$.
+
+Although its tedious and hard to prove the subgroup in general group, while for finite group $G$, the subset $H\sub G$ is only required **closed** to be a subgroup, due to its **finity **, which makes there must be at least one element whose exponent will eventually "falls into itself".
+
+> Proof. Since $H\neq \varnothing$, assume that $a\in H$, hence $a^n\in H$ for all the $n\ge0$ according to the closed conditionof $H$.
+>
+> In the sequence of exponent of $a$, there must be at least two integer $i<j$ which makes $a^j = a^i$, since the element number of $H\sub G$ is finite.
+>
+> This results in $a^{j-i} = a^{i-i} = a^0 = 1 \in H$, which ensures that the identical element is in $H$.
+>
+> Besides, since $j>i$, $j-i-1\ge0$, $a^{-1} = a^{j-i-1}\in H$.
+>
+> Hence the set $H$ is the subgroup of $G$.
+
+
+
+##### Coset
+
+
+
+
+
+
+
+### 3. Cyclic Group
 
 
 

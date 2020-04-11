@@ -23,7 +23,7 @@ Then we defined $\F$ as **event domain** in the sample space $\Omega$.
 Let $P$ be the real function in event domain $\F$, it is defined as **probability measure** or **probability** if holds
 
 1. Non-negative. $P(A)\ge0$.
-2. Normal. $P(\Omega) = 1$.
+2. Regularity. $P(\Omega) = 1$. ==TODO: this translation needs further evidences to support==
 3. Countable Additivity. For the incompatible event list $A_{i}$, $P\left(\displaystyle\sum_{i=1}^{\infin}{A_i}\right) = \displaystyle\sum_{i=1}^{\infin}P(A_i)$.
 
 The triple $(\Omega, \F, P)$ called **probability space**, where $\Omega$ is sample space, $\F$ is the event domain, and $P$ is the probability measure.
