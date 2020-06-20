@@ -6,39 +6,39 @@
 
 ##### # Should I use the SQL keyword uppercase?
 
-It might be an historial convenience when the editor doesn't support syntax highlighting to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so we'll keep it lowercase unless there's good reasons to captialize it.
+It might be an historial convenience when the editor doesn't support syntax highlighting to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so in the modern editor we'll keep it lowercase unless there's good reasons to captialize it.
 
 
 
 ##### # Should I use plural or singualr to name my table?
 
-There's a huge divergence between programmers still. We prefer singular. The most important reason is that, although it seems more logic to name a table that stores more than one user as `users`, but as far as we concerned the name should be considered as an abstraction model or set instead of the real-world object container. The advantage of this perspective is shown more clear in the query process, where the property of record is introduced: 
+There's a huge divergence between programmers still. We prefer singular. The most important reason is that, although it seems more logic to name a table that stores more than one user as `users`, but as far as we concerned the name should be considered as an abstraction model or set instead of the "objects container". The advantage of this perspective is shown more clear in the query process, where we try to get the property of record:
 
 ```sql
 select user.id, user.name from user where user.wealth > 1000;
 select users.id, users.name from users where users.wealth > 1000;
 ```
 
-Comparing the two query above, there's no doubt that it looks more naturally that we access the property of an singular like `user.name` instead of `users.name`(what is that?).
+Comparing the two query above, there's no doubt that it looks more naturally that we access the property of object like `user.name` instead of `users.name`.
 
-Besides the perspective how we consider about the table, it also reduce the code length, which contributes to the simplity, and provides more readibility because the plural might be complex in some cases.  
+Besides the perspective how we consider about the table, it also reduce the code length, which contributes to the simplity, and provides more readibility since the plural might be complex in some cases.  
 
 > You can refer the further disscussion in the link [https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names](https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names), which provides detailed examples and reasons.
-
+>
 > And we strongly recommend the answer [https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vs-plural-names#3894235](https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vs-plural-names#3894235) which introduce the uninflected idea which is pretty convictive.
 
 
 
 ##### # Should I use the underscore or camelcase to name the table or column?
 
-There's also a huge divergence. For now in practics we use the underscore style in both cases. 
+There's also a huge divergence. For now we use the underscore style in both cases in practice.
 
 
 
 
 
 
-### 2. Table
+### 2. Table Operation
 
 ##### # `CREATE TABLE`
 

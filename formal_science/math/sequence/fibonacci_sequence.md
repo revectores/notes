@@ -57,13 +57,13 @@ Since the fibonacci sequence is defined by induction, all of them can be easily 
 It's well-known that fibonacci sequence is the typical (and the most simple) **Linear Homogeneous Recurrence Relations with Constant Coefficients**, the general term of it can be retrived by characteristic equation $x^2 = x + 1$, the two roots, often noted as $\alpha$ and $\beta$, which are 
 
 $$
-\alpha = \cfrac{1+\sqrt{5}}{2}, ~~~~ \beta = \cfrac{1-\sqrt{5}}{2}
+\alpha = \dfrac{1+\sqrt{5}}{2}, ~~~~ \beta = \dfrac{1-\sqrt{5}}{2}
 $$
 
 and the general term of fibonacci sequence is
 
 $$
-f_n = \cfrac{\alpha^n+\beta^n}{\sqrt{5}} = \cfrac{1}{\sqrt{5}} \left( \cfrac{1+\sqrt{5}}{2} \right)^n + \cfrac{1}{\sqrt{5}} \left( \cfrac{1-\sqrt{5}}{2} \right)^n
+f_n = \dfrac{\alpha^n+\beta^n}{\sqrt{5}} = \dfrac{1}{\sqrt{5}} \left( \dfrac{1+\sqrt{5}}{2} \right)^n + \dfrac{1}{\sqrt{5}} \left( \dfrac{1-\sqrt{5}}{2} \right)^n
 $$
 
 Since they're both the roots of characteristic equation, we have $\alpha^2 = \alpha + 1$ and $\beta^2 = \beta + 1$.
@@ -76,10 +76,10 @@ Since they're both the roots of characteristic equation, we have $\alpha^2 = \al
 
 2. $\alpha = \varphi = 1.618...$, where $\varphi$ is so-called **golden ratio**.
 
-3. $u_{n}$ is the closest integer to $\cfrac{\alpha^n}{\sqrt{5}}$. This is obvious since the $\beta^n$ term approaches 0 as $n$ increase. This property can be also written as the limit form:
+3. $u_{n}$ is the closest integer to $\dfrac{\alpha^n}{\sqrt{5}}$. This is obvious since the $\beta^n$ term approaches 0 as $n$ increase. This property can be also written as the limit form:
 
 	$$
-	\lim_{n\rightarrow\infin} \left| u_{n} - \cfrac{\alpha^n}{\sqrt{5}} \right| = 0
+	\lim_{n\rightarrow\infin} \left| u_{n} - \dfrac{\alpha^n}{\sqrt{5}} \right| = 0
 	$$
 
 	This property tells us that the fibonacci sequence grows as fast as sequence $\alpha^n/\sqrt{5}$, the latter one is a simple geometric sequence, whose value can be evaluate easier.

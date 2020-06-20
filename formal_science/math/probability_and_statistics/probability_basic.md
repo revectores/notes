@@ -38,20 +38,19 @@ Several Properties can be inferred from the axiomationzation of probability:
 
 1. The probability of impossible event is 0. i.e. $P(\varnothing)=0$ 
 
-> Proof. Let $A_{1} = \Omega$, $A_{i} = \varnothing$ for $n\ge2$, notice that $\Omega \cap \varnothing = \varnothing$, hence this is a incompatible event list, based on the conutable addivity,
+> Proof. Let $A_{1} = \Omega$, $A_{i} = \varnothing$ for $i\ge2$, notice that $\Omega \cap \varnothing = \varnothing \cap \varnothing = \varnothing$, hence, this is an incompatible event list, based on the conutable addivity,
 > 
 > $$
 > P\left(\Omega + \sum_{i=2}^{\infin} \varnothing\right)
-> = P\left(\Omega\right) + P\left(\sum_{i=2}^{\infin} \varnothing\right)
-> = 1 + P\left(\sum_{i=2}^{\infin} \varnothing\right)
-> = 1 + P(\varnothing)\sum_{i=2}^{\infin} \le 1
+> = P(\Omega) + P(\varnothing)\sum_{i=2}^{\infin} 1
+> = 1 + P(\varnothing)\sum_{i=2}^{\infin} 1\le 1
 > $$
 > 
 > Hence $P(\varnothing) = 0$.
 
 2. The countable additivity can be reduced to the finite form.
 
-> Proof. For finite event $A_i, i\le n$, let $A_i = \varnothing$ for $i\gt n$, notice that $A_i\cap \varnothing = \varnothing$ for any event $A_{i}$, which means this is an incompatible event list, thus
+> Proof. For finite event $A_i, i\le n$, we expand the subscript $A_i = \varnothing$ for $i\gt n$, notice that $A_i\cap \varnothing = \varnothing$ for any event $A_{i}$, which guranteed $A_i$ is an incompatible event list, thus
 > 
 > $$
 > P\left(\sum_{i=1}^{n} A_i \right)
@@ -65,13 +64,14 @@ Several Properties can be inferred from the axiomationzation of probability:
 
 4. For $B\sub A$, $P(A-B) = P(A) - P(B)$. Generally, $P(A\backslash B) = P(A) - P(AB)$.
 
-5. If $B\sub A$, $P(B)\le P(A)$.
+    **Corollary**. For $B\sub A$, $P(B)\le P(A)$
 
 6. $0\le P(A)\le1$.
 
-7. $P(A\cup B) = P(A) + P(B) - P(AB)$.
+6. $P(A\cup B) = P(A) + P(B) - P(AB)$.
 
-8. $P(A\cup B) \le P(A) + P(B)$.
+    **Corollary**. $P(A\cup B) \le P(A) + P(B)$.
+
 
 
 

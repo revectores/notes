@@ -1,6 +1,6 @@
 # Flask Basis
 
-### 1. A Quick Overview
+### 1. Framework
 
 ```python
 from flask import Flask
@@ -22,7 +22,7 @@ Now let's check the structure of the program. First we create a `Flask` object `
 
 ### 2. Deploy & Configuration
 
-##### # local CLI pathway
+##### # Local Deployment
 
 Besides writing in the code, We can use the CLI tool (like bash) to run the object like this:
 
@@ -51,7 +51,7 @@ flask run --host=0.0.0.0
 
 
 
-##### # Industrial Pathway
+##### # Server Deployment
 
 The fact is `run` method (no matter code way or CLI way) is not the standard method and usually deprecated in production because the bad proformance. When actually deployed in server side, the common way is use `nginx`, `gunicorn`, or some other web solutions.
 
@@ -61,7 +61,7 @@ The fact is `run` method (no matter code way or CLI way) is not the standard met
 
 ### 3. Parameters
 
-##### 3.1 Routing
+##### # Routing
 
 Decorator is used to create the create route mapping, parameter in the path can be injected through `<var>` format:
 
@@ -73,7 +73,7 @@ def user(username):
 
 The bottom mechanism about decorator is explained at Python Cookbook.
 
-And more specific, you can contorl the type of parameter:
+And more specific, you can control the type of parameter:
 
 ```python
 @app.route('/user/<string:username>')
@@ -82,7 +82,9 @@ And more specific, you can contorl the type of parameter:
 
 The type includes `string`, `path`, `int`, `float`, and `uuid`.
 
-##### 3.2 Request Method
+
+
+##### # Request Method
 
 By default only `GET` method is allowed to a path, the allowed methods can be set as another decorator parameter:
 
@@ -101,15 +103,16 @@ e.g. the login path usually both shows the login form and receives the form post
 ```python
 @app.route('/login', methods=['GET', 'POST'])
 def login(){
-  if request.method == 'GET':
-  	return login_check()
-  else:  # Flask will block any other request method besides allowed.
-  			 # Well anyway this is still not the best practice to SE XD.
-  	return show_the_login_form()
+	if request.method == 'GET':
+		return login_check()
+	else:  # Flask will block any other request method besides allowed.
+  		return show_the_login_form()
 }
 ```
 
-##### 3.3 Request Parameters
+
+
+##### # Request Parameters
 
 The parameters passed by `POST` and `GET` are also stored in the `request` object as `request.form` and `request.args` dictionary respectively:
 
@@ -147,6 +150,10 @@ def user(username):
 
 
 
+
+
+
+
 ### 5. Response Object
 
 For the most simple case we just return a string (`render_templates` also just render a page content to a string, you can check its type to confirm this). While the response is more than just contents, as the request, it also includes the header, and status code, so we need a `response` object instead of only built-in string. In the simple returned string case,  flask converts the string into `response` object automatically, and add `200` status with no header.
@@ -167,9 +174,11 @@ def user():
 
 
 
+
+
 ### 6. URL Redirection
 
-##### 6.1. Slash Behavior
+##### # Slash Behavior
 
 The behavior about request to ending slash is a little tricky, basically, you can achieve a "folder" by consider it as a "file", which means you can get a slash-end url by accessing it without ending slash, at this time a 308 redirection appeared. The reverse approach is not allowed.
 
@@ -200,7 +209,7 @@ def unslash():
 
 
 
-##### 6.2 Redirection
+##### # Redirection
 
 `redirect` methods are required to do the redirection.
 
@@ -218,7 +227,9 @@ def re():
 
 Usually the `redirect` method is used together with `url_for ` method, which maps the function name and parameters to url.
 
-##### 6.3 URL Building
+
+
+##### # URL Building
 
 ```python
 from flask import url_for
@@ -253,9 +264,13 @@ url_for('static', filename="style.css")
 
 
 
+
+
+
+
 ### 7. Cookies and Sessions
 
-##### 7.1. Cookies
+##### # Cookies
 
 You can get/set cookies from request/response object:
 
@@ -278,7 +293,7 @@ def get_name():
 
 
 
-##### 7.2. Session
+##### # Session
 
 Session is bulit on the cookies mechanism with crypto technique appied to identify the user securely. The info you want to store will be encrypted to a string and stored at one cookie item named session, so the infomation can be stored in user side to show its identification but only server knows its content.
 
@@ -324,6 +339,10 @@ In this example, the `/` page indicates wheather the username is set. `/login` a
 
 
 
+
+
+
+
 ### 8. Files Upload
 
 You should able to understand this through the following demo:
@@ -351,6 +370,10 @@ def upload():
 ```
 
 Notices that the `<from>` element should has attribuate `enctype="multipart/form-data"` to make the browser support file transfer, otherwise no files will be transfer to the server.
+
+
+
+
 
 
 
