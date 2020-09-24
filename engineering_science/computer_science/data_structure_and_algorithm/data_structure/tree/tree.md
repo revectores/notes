@@ -255,7 +255,7 @@ We introduce three different types of binary tree here:
 Apparently, inclusion relation exists in these three types:
 
 Full Tree < Complete Tree < Perfect Tree
- 
+
 
 
 

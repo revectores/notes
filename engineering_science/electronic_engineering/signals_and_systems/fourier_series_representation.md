@@ -93,6 +93,7 @@ $$
 >
 
 
+
 ### Property of Fouries Transformation
 
 1. Linearity. For any two signals $x(t), y(t)$ which corresponding to fouries series $a_k, b_k$, the fouries series of the linear combination of them will also be the same linear combination of the fouries series:

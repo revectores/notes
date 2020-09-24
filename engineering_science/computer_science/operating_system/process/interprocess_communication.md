@@ -14,19 +14,15 @@ In this section we'll introduce what is race condition and critical range, arise
 
 The typical usage of this array is described like this: if a process wants to prints file, it must first read the next empty index `out`, put filename into the empty space, and `out++`.
 
-Now consider two process A and B, process A wants to add a filename into the queue, so it reads the `out`, which is 7, coincidently (and going to be much more regular as the increasing core numbers), right after this reading is completed, operating system thinks this process runs too much time and transfer CPU time from A to B, B also wants to print file, so it also reads the next empty array index, which is **still** 7, and then put the filename into `spooler[7]`, and give the CPU back to process A, now, process A **DO NOT** know that `spooler[7]` has been writen by process B, it continues the task after reading `out`, that is, overwrite(not intentionally, of course) `spooler[7]` by new filename, and execute `out++`.
+<img src="race_condition.png" alt="race_condition" style="zoom:55%; float:right"/>Now consider two process A and B, process A wants to add a filename into the queue, so it reads the `out`, which is 7, coincidently (and going to be much more regular as the increasing core numbers), right after this reading is completed, operating system thinks this process runs too much time and transfer CPU time from A to B, B also wants to print file, so it also reads the next empty array index, which is **still** 7, and then put the filename into `spooler[7]`, and give the CPU back to process A, now, process A **DO NOT** know that `spooler[7]` has been writen by process B, it continues the task after reading `out`, that is, overwrite(not intentionally, of course) `spooler[7]` by new filename, and execute `out++`.
 
 Obviously, this result is not what we want when process A and process B runs sequentially strictly. This situation, when the result of processes is determined by different scheduling sequence, usually occurs when two processes shared the same resource(memory, device, etc.) is named **race condition**.
-
-<img src="race_condition.png" alt="race_condition" style="zoom:70%;" />
 
 
 
 ##### Four Requirements of IPC solutions for Race Condition
 
-Now we model the codes of the two process, defining the code blocks that using shared resources as **critical region**, then solution of the race condition is: Avoiding any two processes to enter critical region at the same time (for the same resource), called **mutual exclusion**. Four the problem occured in last section, the following graph shows the solution by blocking B when A has already in the critical region:
-
-<img src="critical_region.png" alt="critical_region" style="zoom:70%;" />
+<img src="critical_region.png" alt="critical_region" style="zoom:45%; float:right" />Now we model the codes of the two process, defining the code blocks that using shared resources as **critical region**, then solution of the race condition is: Avoiding any two processes to enter critical region at the same time (for the same resource), called **mutual exclusion**. Four the problem occured in last section, the following graph shows the solution by blocking B when A has already in the critical regio:
 
 Besides, some conditions are added to restrict the design IPC solutions. Formally we list the four most important conditions as following:
 

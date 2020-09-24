@@ -60,6 +60,31 @@ Based on this, the expectation combination of functions can be devide-and-conque
 
 
 
+##### # Expectation for Variable Function
+
+Variable $X$ with its distribution and function $Y=f(X)$, we don't have to compute the distribution of $Y$ but use the following formula to compute its expectation(the proof is omitted).
+
+$$
+EY = E(f(X)) =
+\left\{\begin{array}{ll}\begin{align}
+& \sum_{k=1}^{\infin}f(x_k)p_k \\
+& \int_{-\infin}^{\infin}f(x_k)p_k\dx
+\end{align}\end{array}\right.
+$$
+
+
+definition of expectation for two-dimension variable
+
+Two-dimension variable function
+
+$$
+EY = E(f(X)) =
+\left\{\begin{array}{ll}\begin{align}
+& \sum_{i=1}^{\infin}\sum_{j=1}^{\infin}f(x_i, y_j)p_{ij} \\
+& \int_{-\infin}^{\infin}\int_{-\infin}^{\infin}f(x_i, y_j)p_{ij}\dx\dy
+\end{align}\end{array}\right.
+$$
+
 
 
 
@@ -87,6 +112,22 @@ Define $\E(X-\E X)^2$ as the **variance** of variable $X$ if the expectation exi
     As we'll prove in the property of convariance, the convariance for two independant variables are zero, hence$\D(X\pm Y) = \D X \pm \D Y$ holds for independant variables $X, Y$.
 
 
+
+The variance of standard normal distribution $N(0, 1)$:
+
+$$
+E(X^2) = x^2\varphi(x)\dx = 1
+$$
+
+The variance of $N(0, \sigma^2)$ is $\sigma^2$.
+
+Standardization of random variable:
+
+$$
+Y = \frac{X-EX}{\sqrt{\Var{X}}}
+$$
+
+Now we have $\E Y = 0, \Var Y = 1$
 
 
 
@@ -172,6 +213,8 @@ Chebyshev's inequality shows the relationships between expectation and variance.
 $$
 P\{ |X-\E X| \ge b \} \le \frac{\D X}{b^2}
 $$
+
+
 
 
 

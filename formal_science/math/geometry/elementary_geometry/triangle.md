@@ -1,6 +1,6 @@
 # Triangle
 
-### Basic Concepts
+### 1. Basic Concepts
 
 ##### # Definition
 
@@ -8,51 +8,51 @@ Notes: This document describes the triangle in Euclidean geometry and Euclidean 
 
 
 
-
-
-##### # Classification
+### 2. Classification
 
 The triangle can be classified according to the sides or the angles.
 
-1. By sides, the triangle can be classified as equilateral triangle, isosceles triangle, and scalene triangle.
 
-	- The **equilateral triangle** has all sides the same length. In fact, you can prove that all the angles are also the same, as $60^\circ$.
 
-	- The **isosceles triangle** has two sides of equal length. An isosceles triangle also has two angles of the same measure, namely the angles opposite to the two sides of the same length, which named as **isosceles triangle theorem**, which is known and proved by Euclid. Notice that the equilateral triangle is a special isosceles triangle.
+##### # Classify By Sides
 
-	- The **scalene triangle** has all its sides of different lengths. Equivalently, it has all angles of different measure.
+By sides, the triangle can be classified as equilateral triangle, isosceles triangle, and scalene triangle.
 
-2. By angles, the triangle can be classified as right triangle, acute triangle, and obtuse triangle.
+- The **equilateral triangle** has all sides the same length. In fact, you can prove that all the angles are also the same, as $60^\circ$.
 
-	- The **right triangle** has one of its interior angles as the right angle.
+- The **isosceles triangle** has two sides of equal length. An isosceles triangle also has two angles of the same measure, namely the angles opposite to the two sides of the same length, which named as **isosceles triangle theorem**, which is known and proved by Euclid. Notice that the equilateral triangle is a special isosceles triangle.
 
-		The right triangle might be the most important triangle type, since all the triangles can be divided into two triangle, through this, all the shaped constructed by lines can be expressed by the right triangle. Besides, the relation between the sides and angles of a right triangle is the basis for **trigonometry**.
-
-		Special names introduced for the right triangle: The side opposite the right angle is called the **hypotenuse**, and the sides adjacent to the right angle are called **legs** or **catheti** (singular: **cathetus**).
-
-	If a triangle is not a right triangle, then it's called **oblique triangle**.
-
-	- The **acute triangle** has all its angles acute.	
-
-	- The **obtuse triangle** has one angle more than $90^\circ$.
-
-	Based on the law of cosine, the sides relation for each shape is: (where the $c$ is the longest side of triangle)
-
-	- The right triangle, $a^2 + b^2 = c^2$.
-
-	- The acute triangle, $a^2 + b^2 > c^2$.
-
-	- The obtuse triangle, $a^2 + b^2 < c^2$.
+- The **scalene triangle** has all its sides of different lengths. Equivalently, it has all angles of different measure.
 
 
 
+##### # Classify by Angles
+
+By angles, the triangle can be classified as right triangle, acute triangle, and obtuse triangle.
+
+**Right triangle** has one of its interior angles as the right angle. Right triangle might be the most important triangle, even the most important shape, since all the triangles can be divided into two right triangle, and all the shaped constructed by lines can be expressed by the right triangle eventually. The relation between the sides and angles of a right triangle is the basis for **trigonometry**.
+
+New names are introduced for the right triangle: The side opposite the right angle is called the **hypotenuse**, and the sides adjacent to the right angle are called **legs** or **catheti** (singular: **cathetus**).
+
+A triangle is a **oblique triangle** if it's not a triangle. The **acute triangle** has all its angles acute. The **obtuse triangle** has one angle more than $90^\circ$.
+
+Based on the law of cosine, the sides relation for each shape is: (where the $c$ is the longest side of triangle)
+
+- The right triangle, $a^2 + b^2 = c^2$.
+
+- The acute triangle, $a^2 + b^2 > c^2$.
+
+- The obtuse triangle, $a^2 + b^2 < c^2$.
 
 
 
 
-### Associated Geometry Object
 
-<F12>##### # Introduction
+
+
+### 4. Associated Geometry Object
+
+##### # Introduction
 
 Thousands of geometry object (especially points) associated with the triangle, and each of them satisfying some unique property. Often, a special point is constructed by finding three lines associated in a symmetrical way with the three sides (or vertexes) and then proving that the three lines meet in a single point. An important tool for proving the concurrent is **Ceva's theorem**. Similarly, lines associated with a triangle are often constructed by proving that three symmetrically constructed points are collinear, where **Menelaus' theorem** gives a useful general criterion. We'll introduce the most commonly encountered geometry object in this section.
 
@@ -67,6 +67,10 @@ The **angle bisector** of a triangle is a straight line through a vertex which c
 The **median** of a triangle is a straight line through a vertex and the midpoint of the opposite side, and divides the triangle into two equal areas.
 
 
+
+
+
+### 5. Center of Triangle
 
 ##### # Circumcenter
 
@@ -94,17 +98,15 @@ Thales' theorem implies that whether the circumcenter lies inside or outside the
 
 ##### # Orthocenter
 
-The three altitudes of triangles intersect in a single point, denoted by $H$.
+The three altitudes of triangles intersect in a single point, denoted by $H$.<img src="Orthocenter_proof.png" alt="Orthocenter_proof" style="zoom:50%; float:right" />
 
 > Proof that three altitudes in a triangle meet in a single point.
->
-> <img src="Orthocenter_proof.png" alt="Orthocenter_proof" style="zoom:80%;" />
 >
 > As shown, in $\triangle ABC$ the altitudes $AP, BQ, CR$ are constructed.
 >
 > To apply the Ceva's theorem, we need to 
 >
->
+> 
 >
 >
 >

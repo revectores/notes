@@ -47,7 +47,7 @@ $$
 
 Where
 $$
-\overline X = \sum X_i, ~~~~ S_n = \frac{1}{n} \sum(\overline X-X_i)^2
+\overline X = \sum X_i, ~~~~ S_n^2 = \frac{1}{n} \sum(\overline X-X_i)^2
 $$
 The physical meaning of this is plain: we use the average of samples as the center, and extends the interval based on the variance of samples.
 
