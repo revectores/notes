@@ -1,4 +1,4 @@
-NoSQL
+nosql
 
 - Distributed, fault-tolerant architecture
 - No fixed schema (formally described structure)

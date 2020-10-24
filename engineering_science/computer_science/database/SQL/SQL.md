@@ -4,13 +4,13 @@
 
 ### 1. Naming Convention
 
-##### # Should I use the SQL keyword uppercase?
+##### # Keyword Case
 
-It might be an historial convenience when the editor doesn't support syntax highlighting to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so in the modern editor we'll keep it lowercase unless there's good reasons to captialize it.
+It might be an historial convenience when the editor doesn't support syntax highlighting to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so we'll keep it lowercase, as the modern Homo sapiens.
 
 
 
-##### # Should I use plural or singualr to name my table?
+##### # Table Name Form
 
 There's a huge divergence between programmers still. We prefer singular. The most important reason is that, although it seems more logic to name a table that stores more than one user as `users`, but as far as we concerned the name should be considered as an abstraction model or set instead of the "objects container". The advantage of this perspective is shown more clear in the query process, where we try to get the property of record:
 
@@ -29,9 +29,11 @@ Besides the perspective how we consider about the table, it also reduce the code
 
 
 
-##### # Should I use the underscore or camelcase to name the table or column?
+##### # under_score or camelCase
 
-There's also a huge divergence. For now we use the underscore style in both cases in practice.
+There's a huge divergence. For now we use the underscore style in both cases in practice.
+
+
 
 
 
@@ -45,78 +47,165 @@ There's also a huge divergence. For now we use the underscore style in both case
 To illustrate the syntax details of create a new table, here we exam a example about modeling a person by the table:
 
 ```sql
-CREATE TABLE person (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name TEXT NOT NULL,
-	age INTEGER NOT NULL,
-    wealth NUMERIC NOT NULL DEFAULT 0;
+create table person (
+	id integer PRIMARY KEY AUTO_INCREMENT,
+    name text not null,
+	age text not null,
+    wealth numeric not null default 0;
 );
 ```
 
-Here we create a table named `person` with three columns: `id`, `name`, `birthday`, and `wealth`with the **DATATYPE** `INTEGER`, `TEXT`, `INTEGER`, and `NUMERIC` respectively.
+Here we create a table named `person` with three columns: `id`, `name`, `birthday`, and `wealth` with **data type** `INTEGER`, `TEXT`, `INTEGER`, and `NUMERIC` respectively.
 
 Specially, `id` is specified as the `PRIMARY KEY` of this table, and it is set to `AUTO_INCREMENT`, by doing this, we're free to control this column manually when inserting new record, but let the database increase `1` for the `id` field each time we insert new record automatically.
 
 Normally, when we insert a new record, if some of the columns are not assigned, it will be set as the default value, if no default value given, it will be set as `NULL`. If one column is declared as `NOT NULL`, when you try to assign it as `NULL`, the database will raise an error. Notice that since the primary key of table must not be null obviously, so there's no necessary to specify `NOT NULL` to `id` field.
 
-If the name of table already exists, this expression will raise an error about `Table 'table_name' already exists` . To create table only if it has not been created, use `CREATE TABLE IF NOT EXISTS`, the syntax is the same as simple `CERATE TABLE`.
+If the name of table already exists, this expression will raise an error about `Table 'table_name' already exists` . To create table only if it has not been created, use
 
 ```sql
-CREATE TABLE IF NOT EXISTS person ();
+create table if not exists person (...);
 ```
 
 
 
-##### # `DROP` and `TRUNCATE`
+##### # `drop` and `truncate`
 
-Use `DROP TABLE table_name` command to delete a table: 
+Use `drop table [table_name]` command to delete a table: 
 
-If the table doesn't exists the `Unknown table` error will raise, you can use the `DROP TABLE IF EXISTS` to avoid this.
+If the table doesn't exists the `Unknown table` error will raise, you can use the `drop table if exists` to avoid this.
 
-`TRUNCATE TABLE` command delete all the records but not delete the table and its structures ifself.
-
-
+`truncate [table_name]` command delete all the records but not delete the table and its structures ifself.
 
 
 
 
 
-### 3. Data Retrieve
 
-##### # `SELECT`
 
-`SELECT` use to select records, usually combined with some filter or control commands like `WHERE` and `ORDER`. The simplist example is to select the specify columns of all the records:
+### 3. Query
 
-```sql
-SELECT id, name FROM person;
-```
+##### # `select`
 
-Use the asterisk to select all the columns:
+We use `select` to select records, usually combined with some filter or control commands like `where` and `order`. The simplist example is to select the specify columns of all the records:
 
 ```sql
-SELECT * FROM person;
+select id, name from person;
 ```
 
-Notice that this approach is NOT recommend because of the implicity and the query cost.
-
-
-
-##### # `WHERE`
-
-`WHERE` is used to filter the records which fits specific condition, most of the operators are supported by SQL in the comparison including `=`, `>`, `<`, `>=`, `<=` and `<>`(`!=`). The equality comparison only require SINGLE equal sign. Notice that the expression of unequal comparison operator differs in different Database System. 
-
-SQL supports lots of Logical Operators, includes the common `AND`, `OR` and `NOT`, notice that the operator `&`, `|` are used for the bitwise AND/OR(there's no bitwise NOT but bitwise XOR ^ provided, you can use the XOR to implement NOT manually). 
-
-For example:
+Use `*` to select all fields:
 
 ```sql
-SELECT id, name, age FROM person WHERE person.age = 18;
-SELECT id, name, age FROM person WHERE person.age > 18 AND person.wealth > 1000.0; 
+select * from person;
 ```
 
-Notice that we append the table name before the where condition in the example above. The table name can be omiited in this one-table query case, because there can't be any conflicts, while if we're going to join multiple tables and they share the same column names an error will raise. 
+This usage is **NOT** recommended due to its implicit and the query cost. Always write the name of fields explicitly during the programming.
 
-==todo: Full table of the logic expression of SQL==
+Operations and functions on fields are supported:
+
+```sql
+select ID, name, salary/12, 10
+from instructor;
+```
+
+
+
+
+
+##### # `where`
+
+`where` is used to filter the records that meet specific condition, most of the comparison and logic operators are supported by SQL including `=`, `>`, `<`, `>=`, `<=`,  `<>`(`!=`) and `and`, `or`, `not`. The operator `&`, `|` are used for the bitwise AND/OR (there's no bitwise NOT but bitwise XOR `^` provided, you can use the XOR to implement NOT manually).
+
+Notice that the expression of unequal comparison operator differs in different database system.
+
+For example,
+
+```sql
+select id, name, age from person where person.age = 18;
+select id, name, age from person where person.age > 18 and person.wealth > 1000.0; 
+```
+
+Notice that we append the table name before the where condition in the example above. The table name can be omiited in this one-table query case, because there can't be any conflicts, while if we're going to join multiple tables and they share the same column names an error will raise.
+
+
+
+##### # `distinct`
+
+The results can be repeated by default, to remove the repeated items, add the `distinct` after `select` keyword:
+
+```sql
+select distinct dept_name
+from instructor;
+```
+
+Use `all` to allow the repeats explicitly:
+
+```sql
+select all dept_name
+from instructor;
+```
+
+
+
+##### # `from` clause
+
+The `from` clause constructs Cartesian product. The following example generates each possible pair of instructor-teaches.
+
+```sql
+select *
+from instructor, teaches;
+```
+
+where clause is usually used to get the meaningful results.
+
+```sql
+select name, course_id
+from instructor, teaches
+where instructor.id = teaches.id;
+```
+
+which is equivalent to
+
+```sql
+select name, course_id
+from instructor natural join teaches;
+```
+
+
+
+##### # Rename
+
+Rename operation is supported by keyword `as`:
+
+```sql
+select ID, name, salary/12 as monthly_salary
+from instructor;
+```
+
+```sql
+
+```
+
+
+
+
+
+
+
+### 4. Join
+
+
+
+```sql
+select *
+from instructor natural join teaches;
+```
+
+
+
+
+
+### 5. Group
 
 
 
@@ -126,23 +215,23 @@ Notice that we append the table name before the where condition in the example a
 
 ### 4. Records Modification
 
-##### # `INSERT`
+##### # `insert`
 
-Use `INSERT` query to insert new record into the database:
+Use `insert` query to insert new record into the database:
 
 ```sql
-INSERT INTO person(name, age, wealth)
-VALUES ('Robert', 20, 1000.0), (Lewis, 15, 50.0);
+insert into person(name, age, wealth)
+values ('Robert', 20, 1000.0), (Lewis, 15, 50.0);
 -- Notice that this syntax is not supported by all databases, as we know for now this is supported by MySQL and SQLite3.
 -- For those don't support this you might need UNION.
 ```
 
 
 
-##### # `DELETE`
+##### # `delete`
 
 ```sql
-DELETE FROM user WHERE username='hello';
+delete from user where username='hello';
 ```
 
 
@@ -157,13 +246,130 @@ SELECT COUNT(1) FROM user WHERE username='hello';
 
 `COUNT` function works as followed: it executes for every record, and if the return value is not `NULL`, the result adds 1. A single `1` may be a little tricky, it just means that for all filtered records by `WHERE`, it always return 1, which is not `NULL`, as the result the return value will be the number of records.
 
+$$
+
+$$
 
 
-##### # Calculation Function
+
+
+### 5. Function
 
 ```sql
-SELECT SUM(Price) FROM Products;
-SELECT AVG(Price) FROM Products;
+select sum(Price) from Products;
+select avg(Price) from Products;
 ```
 
+
+
+
+
+
+
+##### # `group by`
+
+
+
+##### # `having`
+
+As known, `where` is the filter condition for the tuple, while `having` clause is the filter condition for group.
+
+```sql
+select dept_name, avg(salary)
+from instructor
+group by dept_name
+having avg(salary) > 42000;
+```
+
+When combining the `where` and `group by`, `where` should be applied before the grouping process, while `having` clause executes after the grouping has finished, hence the cluster function can be applid in the clause.
+
+Any 
+
+
+
+##### # `null` in Cluster Function
+
+All the cluster function ignores `null` from input except `count(*)`, for example, 
+
+```sql
+select sum(salary) from instructor
+# The `null` value in salary will be omitted.
+```
+
+Specially, if all the inputs are `null`, cluster function returns `null` while `count` function returns `0`.
+
+
+
+
+
+
+##### # `with`
+
+Find the department with maximum budget:
+
+```sql
+with max budget(value) as (
+	select max(budget) from department
+)
+select budget, department.dept_name
+from department, max_budget
+where department.budget = max_budget.value 
+```
+
+
+
+
+
+### SQL Join
+
+Join operation:
+
+- join type
+- join 
+
+
+There are four types of join operations:
+
+- Inner join only keeps the matched tuples.
+- The left outer join also keeps the tuple (even unmatched) on the left table.
+- The right outer join also keeps the tuple (even unmatched) on the right table.
+- The full outer join keeps all the tuples on both table.
+
+Natural join automatically detect the same columns to match, while `on` and `using` can be applied to tell which columns to match manually. The difference is: `using`, same as natural, removes duplicates while `on` keeps them.
+
+
+
+```sql
+select * from course inner join prereq on
+course.course_id = prereq.course_id;
+```
+
+
+
+
+
+### Perspective
+
+
+
+
+
+
+```sql
+select dept_name, count(*) as instructor_count
+from department left outer join instructor
+using department.dept_name = instructor.dept_name
+group by dept_name
+
+
+```
+
+
+We can create view to added abstraction level to real tables:
+
+```sql
+create view view_name[(<column_name1>, <column_name2>, ...)]
+as <query_expression>
+[with check option];
+```
 

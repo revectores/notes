@@ -84,7 +84,7 @@ $$
 \max_\alpha \alpha_i - \frac{1}
 $$
 
-primal problem: solving a variable $w\in\R^d$. dual problem: solving a variable $\alpha\in\R^N$. sometimes $N\ll d$, by dualing we can simplify the computation.
+primal problem: solving a variable $w\in\mathbb{R}^d$. dual problem: solving a variable $\alpha\in\mathbb{R}^N$. sometimes $N\ll d$, by dualing we can simplify the computation.
 
 $\alpha$ is often sparse with few non-zero elements.
 

@@ -1,5 +1,3 @@
-[TOC]
-
 # Linear List
 
 ### 1. Introduction
@@ -65,7 +63,7 @@ The sequence list stores all the records in the continuous memory, which gurante
 
 The other approach to storage linear list is linked list. Linked list values the `next` relationship between nodes, who determines to storage the address of next address with an extended field besides the data field. This implies that we can't read some data in the middle of the linked list directly, we have to interate everything from the beginning, so the linked list only support **Sequential Reading**. Once we know where the first element is, through the interation of `next` operation we cloud always get all elements on the list.
 
-![Singly Linked List](static/singly_linked_list.png)
+![Singly Linked List](singly_linked_list.png)
 
 Normally, the general linear list structure won't limit the subscripting, insertion and deletion operation, these operations are allowed to act on any place in the linear list, while there're two type of special linear list which limit these operations, make them can only operate in the specific place: **Stack** and **Queue**.
 
@@ -188,7 +186,7 @@ Node_ptr new_node(char data){
 
 To avoid some problems caused by the operations assoicated with the first element, we'll add an special empty element to be the `head` or `tail` node in some cases which is usually called the **Sentinel Node** or **Dummy Node**, as the result, the actual meaningful first/last element will be the next/previous element of `head/tail` element. Since sentinel `head` is used more frequently than sentinel `tail`, we'll only talk about the sentinel `head` in this illustration.
 
-![Singly Linked List with Sentinel Head](static/singly_linked_list_with_sentinel_head.png)
+![Singly Linked List with Sentinel Head](singly_linked_list_with_sentinel_head.png)
 
 The structure of the sentinel head is the same as normal element, and the data field of it will be set as a meaningless value which won't appear in the meaningful data. E.G. We can set data field of the sentinel as `0` if the normal datas are guaranteed to be positive or visible character.
 

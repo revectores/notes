@@ -2,11 +2,14 @@
 
 ### 1. Why DNS
 
-As we known, the IP address is no more than 32-bit binary, represented by dotted-decimal notation ususally. Although applying this simplication, the notation is still not quite friendly to human beings. Hence Internet create a text-based **domain name ** to replace IP address, the system that maps domain name to IP address is the **domain name system**.
+As we known, the [IP address](../http/http.md) is a 32-bits binary number, usually represented by dotted-decimal notation. Even so, the notation is still not friendly to human beings. Hence we invent **domain name**, and build a system that maps domain name to IP address, that is, the **domain name system(DNS)**.
 
-When the user tries to access the domain name in application layer(browser normally), the DNS system will map the domain name to the coressponding IP address, prepared for the TCP connection, for the next step.
+When the user tries to access the domain name in application layer (such as browser or ssh), computer queries the DNS system to map the domain name into its corresponding IP address, prepared for the TCP connection in next step.
 
-有了域名以后就有人开始怀疑IP地址的必要性: 既然有用户友好的域名存在, 干脆弄一个新的RFC修改Internet Protocol把其中IP地址改成域名不就可以了? 这是一个很蠢的主意, IP是定长的二进制数, 而域名为了实用好记是变长的复杂的ASCII符号组合(更不要提现在出现了特定语言的域名技术, 比如中文域名技术), 其长度开销是非常大的, 因此这个假想中的协议将不得不在IP数据报中占用大量的空间, 导致网络层上的包包变得非常大造成路由网络的负载过多, 严重违背了IP层以下的部分应当尽可能简单的设计理念.
+So why bother to do the conversion? Why don't we just throw [RFC 791](https://tools.ietf.org/html/rfc791) (and its updates) away and use the user friendly domain name as new IP address? This is not a good idea since
+
+- User friendly almost always inferres computer unfriendly. IP address is fix-sized binary, easy to process, while domain name contains with complex characters set (see [RFC 3492](https://tools.ietf.org/html/rfc3492) and [RFC 5891](https://tools.ietf.org/html/rfc5891) for the URL unicode support) can be the performance and bandwidth killer in network communication.
+- It's not realistic to replace all the current network devices, you can see how hard this is from the progress of IPv6.
 
 
 
@@ -16,46 +19,44 @@ When the user tries to access the domain name in application layer(browser norma
 
 ### 2. Structure of Domain Name
 
-A domain name is constructed by some **labels**, seperating by dot `.`. For example, `www.google.com`.
+##### # Components
 
-| www | google | com |
-| :-----------: | :--------------: | :-----------: |
-| Third Level Domain | Second Level Domain | Top Level Domain |
+A domain name contains **labels** seperating by dot. For example, the domain name `www.google.com` contain three labels:
 
-The domain name is a layered structure, the rightmost is the **top level domain(TLD)**, second, third, and so on... to the left. Each layer of domain name is managed by the management organization of uppper level. The top level domain name 
+| www | . | google | . | com |
+| :-----------: | :--------------: | :-----------: | :-----------: | :-----------: |
+| Third Level Domain |  | Second Level Domain |  | Top Level Domain |
 
-域名是一个分级的结构系统, 位于最右边的是**顶级域名(Top Level Domain, TLD)**, 往左依次为二级域名、三级域名……各级域名由上一级域名的管理机构进行管理, 顶级域名则由互联网名称与数字地址分配机构(ICANN)进行管理.
+The domain name is a layered structure, the rightmost is the **top level domain(TLD)**, and from right to left there are second level domain, third level domain, and so on. Each layer of domain name is managed by the managInement organization of upper level. The top level domain name is managed by **Internet Corporation for Assigned Names and Numbers(ICANN)**.
 
-域名树的结构和网络主机的物理位置、IP点分十进制表示、子网划分有什么联系呢? 没有任何联系. 域名仅仅是机构按照自己需求划分的, 是一个独立的体系结构. 
+The hierarchy of domain name is not relavent of the physical location and the IP address of hosts. The domain name system is independent.
 
 
 
 ##### # Top Level Domain
 
-顶级域名分为三类: 国家顶级域名(nTLD, ccTLD), 通用顶级域名gTLD和基础结构域名.
+There are three types of top level domains:
 
-```mermaid
-flowchart LR;
-A[top level domain, tld] --> B1[nation top level domain, nTLD]
-A --> B2[generic top level domain, gTLD]
-A --> B3[basic structure domain]
-```
-
-国家顶级域名是国家的缩写, 如中国cn, 美国us, 英国uk, 日本jp等等, 国家顶级域名下注册的二级域名由该国家自行确定. 
-
-通用顶级域名如com, net, org
-
-基础结构域名只有`arpa`一个, 用于反向域名解析. 
+1. Infrastructure top-level domain (arpa). This is reserved for reverse domain name resolution.==TODO: What's this?==
+2. Country code top-level domains (ccTLD). The ccTLD are the two-letter ISO country codes (with some exceptions). Based on the hierarchy of domain name system, the [second level domain](## Second Level Domain) names are regulated by the country itself.
+3. Generic top level domains (gTLD). Such as `com`, `org`.
 
 
 
 ##### # Second Level Domain
 
-我国的二级域名有“类别域名”(类似于通用顶级域名)和行政区域名(类似于国家顶级域名)两类, 类别域名如com, net, org等等(注意到我国的类别域名和意义一致的通用顶级域名的明明是一致的, 当然由于命名是国家任意选取的, 因此实际上也可以不一样, 例如日本就把企业机构的二级域名设定为co而不是com), 行政区域名每个省级行政区分配一个, 如bj, fj等等, 一般政府机构用的比较多. 
+The second level domain name in China includes 34 distinct domain names, each for one province, and 6 type domain names, which is the same as the regulation of top level domain name, while some countries will pick different forms, for example, Japan set the second level domain name to two characters:
 
-另外, 我国还允许直接在cn下注册二级域名, 甚至还建立了几个中文的顶级域名, 如“中国”、“公司”、“网络”, 一个典型的例子就是广电总局(简直黑科技, 目测是利用了某种中文编码).
+| 2nd Domain in China | 2nd Domain in Japan |             Description             |
+| :-----------------: | :-----------------: | :---------------------------------: |
+|         ac          |         ac          |       scientific institution        |
+|         com         |         ed          |             corporation             |
+|         edu         |         go          |       educational institution       |
+|         gov         |         ne          |             government              |
+|         net         |         ne          | network service, information center |
+|         org         |         or          |       non-profit organization       |
 
-
+Register second domain name is peritted, like `revector.cn`. Since the DNS has added supports to most of the Unicode characters, some Chinese domain names have been registered in top level domain, like "中国", "公司", "网络", while few websites use them in practice.
 
 
 
@@ -67,42 +68,39 @@ A --> B3[basic structure domain]
 
 ##### # Domain Name Server
 
-第一小节提到, 当用户在浏览器中输入一个域名并试图对其发起访问时, 首先需要与DNS解析系统进行交互, 从而得到该域名所对应的IP地址, 那么这个过程具体是如何进行的呢? 首先的一个自然的想法是在用户主机上保存一个完整的`domain_name -> ip_address`的映射表(事实上当初ARPANET就是这么做的, 这个映射表叫做**hosts文件**, 其残余仍然在现代操作系统中得以保留下来, 并且作为一种原始的翻墙技术而存在, 这是由于GFW的某部分流量拦截在DNS request阶段就已经发生, 我们将在下面第5节“针对DNS的攻击”部分详述DNS cache pollution方面的内容), 然而由于Internet的主机如此之多, 并且网络结构也在不断变化, 仅仅依靠本地保存明显是不现实的, 因此DNS被设计成一个**分布式查询体系**, 意味着本机需要向其他主机发起解析请求, 这些主机就是所谓**DNS服务器(DNS server)**.
+The simplest solution of resolution (from domain name to IP address) is to maintain a complete mapping table named `hosts`, this is how [ARPANET]() do, and this file is still kept in modern operating system as the local cache of DNS system. In early decades, GFW applied [DNS pollution]() as one method to block forbidden websites, which can be easily bypassed by change the local file `hosts` into actual mapping.
 
-由于域名是具备层级结构的, 因此DNS server也被设计成一个具备**层级结构**的系统, 每一个域名服务器和域名的层级有一定的对应关系, 最高层次的被称为**根域名服务器(root name server)** 其下一层是**顶级域名服务器(Top Level Domain server, TLD server)**, 管理某个或某些顶级域名, 再下一层则是各级权限域名服务器.
+However, since there are so many hosts in the entire Internet and the network structure varies day by day, it's not unrealistic to implement DNS as a local file, or use a few fixed servers to response DNS requests. Instead, it is designed as a distributed query system. 
 
-目前全球的根域名服务器一共有13个, 分别命名为前13个字母a~m. 注意到根域名服务器是一个逻辑概念而不是物理概念, 每一个根域名服务器都由分布在不同地方(可能相距很远)的几台设备构成. 之所以只使用13个根域名服务器可能与DNS报文长度的限制有关. 目前的13个根域名服务器没有任何一个的核心部分放在中国境内(只有根域名服务器的某些**镜像**, ==TODO: 镜像具体是什么意思?==), 根据坊间传说在10年代以前中国是有一台根域名服务器i(序号9)的, 但由于多次DNS劫持/污染事件的发生, 导致国外域名解析受阻, 威胁到互联网的安全, 因此根域名服务器就从中国境内撤走了. ==TODO: 来源请求==
+The DNS servers are designed a hierarchic system corresponding to the hierarchy of domain names. The top level servers are **root name server**, which manage DNS of entire network, then **top level name server(TLD server)**, which manages one of the top level domain, and then are the hierarchy of **authoritative domain name servers**.
 
-权限域名服务器可能是单层的, 也可能是多层的, 这取决于管理该域名公司的自身设定, 例如有一个公司申请了abc.com这个域名, 那么为了管理这个域名及其子域名, 公司需要配置DNS服务器提供解析服务, 可以只配置一台, 这时候整个域就是一个**区**(zone), 也可以配置多台, 例如其下有一个占用三级域"y.abc.com"的部门有非常多的域名, 那么公司可能单独为其设置一个域名服务器, 这时候我们就称abc.com这个**域**被划分成了两个区.
+There are 13 **logical** root domain name servers, denoted as A~M.
 
-(由此观之, DNS的两个结构特点是分布式的和层级的)
+<img src="root_domain_name_servers_map.png" alt="root_domain_name_servers_map"/>
 
-| 根域名服务器                                     |
-| ------------------------------------------------ |
-| 顶级域名服务器                                   |
-| 权限域名服务器1权限域名服务器2...权限域名服务器n |
-
-注意这里的权限域名服务器实际上是具备有多级结构的, 为了叙述的方便, 我们在下面的对解析流程的介绍中首先假定权限域名服务器是单一结构, 然后再对有多级结构的情况进行讨论.
+The topology of authoritative name servers is determined by the institution manages that domain. For example, if one company applied for the domain name `abc.com`, to make the Internet know where its domain name and its subdomain names are, the company should equip a DNS server to provide resolution service. All the domains under one authoritative DNS server constructs a **zone**.
 
 
 
 ##### # Domain Name of Domain Name Server
 
-由于域名服务器本质上还是一种服务器, 因此它们也具有自己的域名(但并不提供Web服务, 因此使用浏览器去访问这些域名是徒劳的). 但域名服务器的域名的级数和它们在解析服务中的地位没有任何关系. 以A根为例, 根域名服务器的域名为
-
-`a.root-servers.net`
-
-有实验资料表明: 通用顶级域名的服务器同样有13个, 分别也命名为a~m, 例如
-
-`a.gtld-servers.net`
-
-注意到根域名服务器和顶级域名服务器都是用.net作为顶级域名.
+Name servers are servers, which have there own domain names as well, while the interpretations of domain name hierarchy is not applied to them. For example, the domain name of root A is `a.root-servers.net` and the gltd server domain name `a.gltd-servers.net`.
 
 
 
-##### # Query Recursively and Repeatedly
+##### # DNS Lookup: Iterative vs Recursive
 
-DNS解析过程如下: 当应用程序意识到需要进行DNS解析时, 首先向本地域名服务器(local name server)发送DNS request报文, 向它询问某个域名对应的IP地址, 于是本地域名服务器接受任务并且决定代替应用程序完成任务. 接着, 本地域名服务器向根域名服务器发送DNS request报文, 根域名服务器并没有闲心完全接手本地域名服务器的任务(她每天要处理那么多的请求), 只是告知它下一步应该去问哪一个顶级域名服务器及其IP地址, 于是本地域名服务器接着向所提供的顶级域名服务器发请求, 它同样也只是告知它下一步应该去文哪一个权限域名服务器及其IP地址(请注意, 在没有缓存机制的情况下, 一直到这里, DNS解析都不可能完成, 因为没有域名是只含有一个顶级域名的, 至少都要含有一个二级域名, 因此所有DNS解析都至少要到权限域名服务器才可能解决), 最后, 本地域名服务器向对应的权限域名服务器发起询问, 权限域名服务器则告知它解析得到的IP地址, 最后, 本地域名服务器再将得到的IP地址告知应用程序. 
+The **DNS lookup** always starts from the commuication between client and **local DNS server**. In both form of DNS query, we only communicate with local DNS server.
+
+After the local DNS server accept the DNS query, there are two approaches to do DNS query: iterative or recursive.
+
+Local domain name server first sends DNS query to root DNS server, who will tells the local DNS server where to find the corresponding TLD DNS server(that is, the IP address of it), then it requests, the TLD DNS server tells 
+
+The iterative DNS lookup
+
+<img src="dns_lookup_iterative.png" alt="dns_lookup_iterative" style="zoom:30%;" />
+
+接着, 本地域名服务器向根域名服务器发送DNS request报文, 根域名服务器并没有闲心完全接手本地域名服务器的任务(她每天要处理那么多的请求), 只是告知它下一步应该去问哪一个顶级域名服务器及其IP地址, 于是本地域名服务器接着向所提供的顶级域名服务器发请求, 它同样也只是告知它下一步应该去文哪一个权限域名服务器及其IP地址(请注意, 在没有缓存机制的情况下, 一直到这里, DNS解析都不可能完成, 因为没有域名是只含有一个顶级域名的, 至少都要含有一个二级域名, 因此所有DNS解析都至少要到权限域名服务器才可能解决), 最后, 本地域名服务器向对应的权限域名服务器发起询问, 权限域名服务器则告知它解析得到的IP地址, 最后, 本地域名服务器再将得到的IP地址告知应用程序. 
 
 现在我们讨论一下上面这个查询过程中的责任分配: 首先, 客户端应用程序向本地域名服务器提出申请, 而作为回答者(responser)的本地域名服务器并不知道答案, 于是本地域名服务器就成了一个新的请求者(requester), 去问另外的回答者, **直到查询到了结果后**再告知客户端应用程序, 这一“帮人帮到底”的查询机制我们叫做**递归查询**, 在这个两层结构中, 递归体现得并不明显, 我们考虑一下如果整个流程都采用递归查询会是什么结果: 当本地域名服务器收到请求以后, 向根域名服务器查询, (到这里都和之前一样)这时, 根域名服务器决心帮server帮到底, 并不直接扔给本地域名服务器一个下一步查询目标, 而是直接去访问这个查询目标, 即顶级域名服务器, 接着, 顶级域名服务器也亲自去访问权限域名服务器, 最后得到一个结果, 向上传回到根域名服务器, 根域名服务器再将结果回传到本地域名服务器, 最后本地域名服务器将结果回传到应用程序. 容易发现, 这实际上是一个五层的递归过程. 
 
@@ -111,6 +109,35 @@ DNS解析过程如下: 当应用程序意识到需要进行DNS解析时, 首先�
 而我们开头所介绍的请求到达本地域名服务器以后所采取的查询方式则称为迭代查询. 在迭代查询中, 查询对象告知的是查询者下一步要查询的目标, 而不是直接告知其结果. 
 
 事实上, 本地域名服务器既可以采取迭代查询方式, 也可以采取递归查询方式, 这取决于本地域名服务器的设定, 但应用较广泛的是迭代查询(所以我们最先介绍这一方式). 
+
+
+
+##### # `dig` Command
+
+`dig`, domain information groper, is a cli tool to make DNS lookup manually. 
+
+```shell
+> dig www.google.com
+
+; <<>> DiG 9.10.6 <<>> www.google.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 9678
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;www.google.com.			IN	A
+
+;; ANSWER SECTION:
+www.google.com.		300	IN	A	31.13.92.35
+
+;; Query time: 6 msec
+;; SERVER: 133.133.5.1#53(133.133.5.1)
+;; WHEN: Tue Oct 20 23:19:39 CST 2020
+;; MSG SIZE  rcvd: 48
+```
+
+
 
 
 
@@ -148,7 +175,7 @@ DNS报文使用的传输层协议是UDP, 首部有12字节(96bit).
 
 ### 5. DNS Attack
 
-在众多针对DNS的攻击手段中, 最著名的一类手法是DNS劫持, 除此之外, 有中国特色的DNS缓存污染是早期GFW得以实现的重要手段之一, 另外还有一类最近发生的比较暴力的攻击手法, 即针对于域名服务器的DDoS攻击, 由于DNS在网络中的重要基础作用, 这类攻击能够有效瘫痪一个很大的网络(下面将会给一些已经发生的实例), 实际上DNS所带来的安全问题完全就是人类的懒惰所带来的结果, 如果人们能够记忆IP地址, 那么DNS的问题也就不会存在. 这和众多Human Error所导致的安全问题一样, 再次表明了痛苦之根源在于人性之万恶.
+在众多针对DNS的攻击手段中, 最著名的一类手法是DNS劫持, 除此之外, 有中国特色的DNS缓存污染是早期GFW得以实现的重要手段之一, 另外还有一类最近发生的比较暴力的攻击手法, 即针对于域名服务器的DDoS攻击, 由于DNS在网络中的重要基础作用, 这类攻击能够有效瘫痪一个很大的网络(下面将会给一些已经发生的实例), 实际上DNS所带来的安全问题完全就是人类的懒惰所带来的结果, 如果人们能够记忆IP地址, 那么DNS的问题也就不会存在.
 
 
 

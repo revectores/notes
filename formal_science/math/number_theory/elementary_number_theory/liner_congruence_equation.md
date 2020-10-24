@@ -1,6 +1,0 @@
-
-
-### Liner Congruence Equation
-
-
-

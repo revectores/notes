@@ -1,2 +1,0 @@
-# Significant Partial Derivative
-

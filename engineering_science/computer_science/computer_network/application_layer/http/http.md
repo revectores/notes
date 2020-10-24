@@ -4,35 +4,30 @@
 
 ##### # Introduction
 
-**万维网(World Wide Web, WWW, 简称为Web)**指的是一个由**链接(link)**互相联系起来的**分布式超媒体(distributed hypermedia)**系统, 其概念核心是链接, 也就是在一个文档中含有指向其他文档的跳转(即所谓的“超媒体”), 特别地, 一段含有指向其他文本的跳转的文本则称为**超文本(hypertext)**. 超文本是万维网的基础.
+The **world wide web** is a distributed hypermedia system linked by the **links**. Those texts contain links points to other texts called **hypertext**. Those media contain links points to other media called **hypermedia**.
 
-万维网的概念是在1989年提出来的, 它的产生使得互联网得以走进非专业人士的使用范围(因为所有文档被关联起来, 只需要点击就可以访问所需要的资源, 这一点在搜索引擎被开发出来以后显得更加明显). 为了建构这样一个系统, 需要解决三个问题:
+Three problems arised for the web:
 
-1. 万维网的资源非常之多, 如何采用一种记号实现名字到资源之间的映射?
+1. How to create bijection beween name and the resource in Web?
+2. How to implement the C/S communication?
+3. How to make computer with different structure hierarchy access the resources on the Web identically?
 
-2. 应该采用怎样的协议实现万维网客户端—服务器的交互?
-
-3. 如何使得不同计算机、不同平台都能够同等地访问万维网上的资源? 
-
-上述三个问题的解决方案分别是[URL](), HTTP和[HTML]().
+[URI](), HTTP and [HTML]() are proposed to solve the three problems. This document introduce HTTP, to be more specific, [HTTP/1.1](## HTTP/1.1) for most of the properties, which is the. The evolution of HTTP protocol specification will be introduce in [7. Evolution of HTTP](# 7. Evolution of HTTP), and the performace comparison in [HTTP_performace_evolution]().
 
 
 
 ##### # Static Document and Dynamic Document
 
-直接由HTML手工写成的文档我们称为**静态文档(static document)**, 因为它们一旦被写成就保持不变, 每一次浏览器访问都会得到相同的结果. 静态文档的编写人员并不需要编程知识就可以写出漂亮的网页(因为HTML本质上是一个标记语言). 显然, 这并不适用于某些快速变化的数据内容, 因此我们开发出了**动态文档(dynamic document)**技术.
+**Static document** is the static hard-coded HTML file, which will return same HTML for all requests, while **dynamic document** is dynamically generated when handling the request.
 
-动态文档并不像静态文档一样静静地蜷缩在服务器的一角, 等待浏览器的访问并将自己交出去. 动态文档的内容是在浏览器访问的时候才由应用程序临时生成的, 这样就可以向浏览器端反馈最新的情况. 值得注意的是, 对于动态文档, 我们需要一个应用程序来接受浏览器输入的参数, 并且根据这些参数生成相应的HTML文档反馈给浏览器, 而规定这些内容(输入数据如何提供给应用程序、动态文档如何创建、输出结果如何使用等等)的标准被称为**通用网关接口(Common Gateway Interface, CGI)**标准, 这个执行数据接受和HTML生成的程序被称为**CGI程序**.
+There are two approaches to create dynamic web site nowadays: **server rendering** and **client rendering**. Normally a web page is rendered by the filling **template** with data. Server rendering fill the data in server/client side respectively.
 
-CGI这个名字的确有些奇特, 至少不像“超文本传输协议HTTP”那样显然, 我们解释一下: 其实这不是什么偏正结构, 是三个独立的短语. 这里的"Common"指的是这个标准可以适用于任何程序设计语言, “Interface”则是指协议设计好了一些封装起来的模块供程序设计语言调用, 而中间的“Gateway”这个词有点意思, 我们知道网关是用于连接两个使用不同协议的网络实体的, 这里使用这个词是因为CGI程序在执行过程中可能需要访问其他的服务器资源(使用相同或不同协议的), 因此其行为类似于一个gateway.
+Pros and Cons of these two approaches:
 
-值得注意的是, 静态文档和动态文档仅仅在服务器端有区别, 浏览器并不能区分这二者, 因为它们都只是传输回一个HTML文档.
-
-
-
-##### # Server Push and Active Document
-
-无论是静态文档还是动态文档, 一旦其被传输到客户端, 信息就完全固定下来, 成了静态的HTML页面, 如果需要使本地的内容持续更新, 则可以采取一些技术, 随着HTML5标准的推进, 这些技术在现在都已经不再使用, 并且在搜索引擎上也很少找到, 因此这里不再介绍有关**服务器推送(server push)**和**活动文档(avtive document)**的内容, 包括已经淘汰的Java Applet.
+|      |          Server Rendering           |           Client Rendering           |
+| ---- | :---------------------------------: | :----------------------------------: |
+| Pros |    Only one request for one page    | Reduce the HTML size through network |
+| Cons | The entire HTML size might be large |    Multiple requests for one page    |
 
 
 
@@ -42,83 +37,138 @@ CGI这个名字的确有些奇特, 至少不像“超文本传输协议HTTP”�
 
 ### 2. HTTP Message
 
-万维网是一个超媒体系统, **超文本传输协议(HyperText Transport Protocol, HTTP)**定义在客户端和服务器之间交换超文本的语法, 二者之间通过交换报文的方式来实现通信, 其中由客户端发送给服务器的报文称为**请求报文(request message)**, 用于请求服务器给自己发送某些资源, 或者在服务器上执行某些命令, 而服务器发送给客户端的报文则是**响应报文(response message)**, 返回客户端所申请的资源, 或者返回命令的执行情况.
+##### # Introduction
 
-学习HTTP的核心内容就是要能手写req/resp报文(当然也要清楚拿到的报文中的每一个字段的意义), 这在网络工程中是非常关键的, 因而熟悉报文的格式是必须的. 下面我们将以报文的字段学习为线索, 叙述目前在HTTP中采用的部分重要技术, 其中最关键的两个部分是**缓存策略(cache strategy)**和**连接管理(connection management)**, 而在req首部中可以采取的**方法(method)**和resp首部中所返回的**状态码(status code)**也是我们学习的关键.
+**Hypertext Transport Protocol(HTTP)** specifies the C/S interface about transporting hypertext by **messages** interchange. The message from client to server is **request message**, to request some resource. The message from server to client is **response message**, to return the resource requested.
 
 
 
-##### # Format of HTTP Messag
+##### # HTTP Message
 
-无论请求报文还是响应报文都由**起始行(start line)**、**首部(headers)**和**实体的主体部分(entity-body)**三个部分构成, 其中两类报文中的起始行是必须的, 首部和主体都并非必须(但一般对于响应报文而言, 不给出首部和主义的响应显然是毫无意义的, 请求报文倒是的确可以写的非常简洁)请求报文中的startline由方法、目标URL和HTTP版本号三个部分构成, 而响应报文中的startline由HTTP版本号、状态码和原因字符串三个部分构成.
+Both the request and response message construct of  three parts: **start line** (necessary), **headers** (optional) and **entity-body** (optional). The start line of request message contains **method**, **request URL** and **HTTP version**. For the response message its HTTP version, **status code** and **reason phrase**.
+
+The request URL can be absolute or relative (the base should be set in header field `host`).
 
 ```http
 method  request-URL  http-version
-
 headers
+
 entity-body
 ```
 
 ```http
-http-version  status-code reason-phrase
-
+http-version  status-code  reason-phrase
 headers
+
 entity-body
 ```
 
-值得注意的是, 语法规定了headers必须总是以一个空行结束, 即使在没有主体部分的情况下也是如此.
-
-两种报文中起始行的关键信息在于req中的`method`和resp中的`status`, 一个是客户端告诉服务器该做什么事情, 另一个则是服务器告诉客户端发生了什么事情.
-
-req报文起始行的最后一个词和resp报文起始行的第一个词给出了所使用HTTP的版本号(这也是两类报文起始行唯一重复出现的词), HTTP的版本号被设计为由**主要版本号**和**次要版本号**两个部分构成`HTTP/<major>.<minor>`
-
-请求报文起始行的第二个词`request-URL`声明了请求访问资源的URL, 可以采用绝对或相对URL. 写相对URL时其`base`需要在headers中使用`host`字段规定.
-
-
-
-##### # HTTP Method
-
-根据是否会在服务器上产生影响, req报文中的动作可以分为安全方法和非安全方法两类, 安全方法包括GET,HEAD和OPTIONS, 它们只会获取服务器上的资源(或服务器所支持的方法), 而不会对资源本身造成改变, 非安全方法包括POST, PUT, DELETE和TRACE. 下面我们将对这7个方法进行具体介绍.
+Note that he HTTP headers must end with an empty line (CRLFCRLF), even through the entity-body is empty.
 
 
 
 
 
-##### # Status Code
-
-status-code告知客户端发生了什么事情, 它被规定为3位十进制数, 目前的状态码类型被分为5大类, 以1~5开头, 因此只需要看状态码的首位数字大致上就可以判定发生了什么事情, 其中已经定义的范围只占到了所分配范围的一小部分, 一些重要且常见的状态码(下面所给出的10个)是值得记忆的.
-
-| 范围    | 已定义范围 | 意义类型   |
-| ------- | ---------- | ---------- |
-| 100~199 | 100,101    | 信息提示   |
-| 200~299 | 200~206    | 成功       |
-| 300~399 | 300~305    | 重定向     |
-| 400~499 | 400~417    | 客户端错误 |
-| 500~599 | 500~505    | 服务器错误 |
 
 
+### 3. HTTP Method
+
+Nine methods are designed for HTTP requests, which can be classified by whether it changes the resouces on the server(we say it is **safe**): `GET`, `HEAD`,  `OPTIONS` and `CONNECT` are safe, since it does not change the resource on the server, while `POST`, `PUT`, `DELETE`, `TRACE` and `PATCH` are not.
+
+**Idempotence** represents whether an identical request can be made once or several times in a row with the same effect while leaving the server in the same state. It's different from safety, the safe method might be non-idempotent(`CONNECT`), and the unsafe method might be idempotence(`PUT`, `DELETE`, `TRACE`). 
+
+| HTTP Methods | Safety | Idempotence |
+| :----------: | :----: | :---------: |
+|     GET      |  YES   |     YES     |
+|     HEAD     |  YES   |     YES     |
+|   OPTIONS    |  YES   |     YES     |
+|   CONNECT    |  YES   |     NO      |
+|     POST     |   NO   |     NO      |
+|     PUT      |   NO   |     YES     |
+|    DELETE    |   NO   |     YES     |
+|    TRACE     |   NO   |     YES     |
+|    PATCH     |   NO   |     NO      |
+
+Note that these propery classifications applied to the functions of methods defined protocol. Server side might break the rules frequently in read world (For example, those sites only use `GET` to perform all CRUD).
+
+
+
+
+
+
+
+### 4. HTTP Status Code
+
+##### # Classifications
+
+**Status code** notify client with how the request has been processed. It's a decimal with 3-digits. The first digit shows the type of status code:
+
+|  Range  | Defined  |     Type     |
+| :-----: | :------: | :----------: |
+| 100~199 | 100, 101 | Information  |
+| 200~299 | 200~206  |   Success    |
+| 300~399 | 300~305  | Redirection  |
+| 400~499 | 400~417  | Client Error |
+| 500~599 | 500~505  | Server Error |
+
+
+
+##### # Utility Description
 
 | status code | default reason phrase | Description                                                  |
 | :---------: | :-------------------: | ------------------------------------------------------------ |
-|     200     |          OK           | 执行成功, 返回所请求的资源                                   |
+|     200     |          OK           | Success. The interpretation of success depends on the reqeust method. |
 |     302     |         Found         | 资源已经被转移, 不在这个URL里了, 但我们为你提供了该资源现在的URL并且附在了header的Location字段中 |
 |     304     |     Not Modified      | 服务器进行了缓存判定, 并且告诉计算机中所储存的缓存还没有过期, 可以继续使用, 不必从我这里拿资源了 |
 |     400     |   Bad Request Error   | req报文中存在语法错误                                        |
 |     401     |     Unauthorized      | 未授权, 需要输入用户名和密码才可以访问                       |
-|     403     |       Forbidden       | 理解你的请求, 但是禁止访问(Understand but not Allowed)       |
+|     403     |       Forbidden       | Understand but not Allowed                                   |
 |     404     |       Not Found       | 没有找到对应的URL, 通常这个命令也会携带一个实体, 以便于客户端的应用程序提供给用户看, 因此404并不意味着没有实体 |
 |     406     |    Not Acceptable     | 服务器无法提供客户端所能够接受的MIME类型(在Accept字段中给出的)现代浏览器一般不会发生这类错误, 因为其Accept字段一般都设定成/, 即能够接受一切MIME类型 |
 |     500     | Interval Server Error | 服务器发生了不可预知的错误                                   |
 |     503     |  Server Unavailable   | 服务器目前不可用, 可以稍后再访问试试                         |
-状态码后面紧跟的原因短语表示对状态码的解释说明, 该参数只对人类使用者有意义, 并且可以随意改动(但一般都使用的是状态码默认的对应说明短语, 例如200一般都写成OK, 写成failed虽然不会影响浏览器的处理结果但是实在很不标准), 计算机只会对status code进行处理. 上面表格中所提供的原因短语是HTTP/1.1标准所建议采用的原因短语.
-
-以下我们将更详细地讨论状态码的更多细节内容.
+The following reason pharse is the descriptive comment text of status code, which will not be processed, hence can be set at will.
 
 
 
-##### # 100/417
+##### # 200 OK
 
-信息性状态码是在HTTP/1.1协议引入的, 实际上对其应用价值目前还存在较大的争议, 下面我们来详细考察一下这部分状态码的作用.
+As mentioned, the interpretation of success depends on the reqeust method.
+
+| Request Method | Interpretation of 200                                        |
+| -------------- | ------------------------------------------------------------ |
+| `GET`          | An entity corresponding to the requested resource is sent in response. |
+| `HEAD`         | The entity-header fields corresponding to the requested resource are sent in the response without any message-body; |
+| `POST`         | An entity describing or containing the result of the action. |
+| `TRACE`        | An entity containing the request message as received by the end server. |
+
+
+
+##### # 201 Created and 202 Accepted
+
+`201-created` indicates the request has been fulfilled and resulted in a new resource being created. The newly created resource can be referenced by the URI(s) returned in the entity of the response, with the most specific URL for the resource given by a `Location` header field.
+
+As required by [RFC 2068#10.2.2](https://tools.ietf.org/html/rfc2068#section-10.2.2), the server MUST create the resource before returning 201 status code, otherwise use `202-accepted` instead if it the request has been accepted but not actually completed. Although accepted, `202-accepted` does not gurantees whether the request will eventually be acted.
+
+
+
+##### # Redirection: 301 Moved Permanently, 302 Found, 307 Temporary Redirect, 308 Permanent Redirect
+
+All of the four status codes indicate a redirection and the destination URL `host` will be provided in the response header. 301 and 308 **redirect permanently**, and 308 does not permit the conversion from POST to GET during redirection. Similar rules applied to 302 and 307: **redirect temporarily**.
+
+The only difference of the four status codes is the semantics: The search engine will remove the index of those redirected pages, while keep those temporarily.
+
+Refer to [HTTP Redirect Codes for RESTful Services](https://tools.ietf.org/id/draft-hunt-http-rest-redirect-00.html), the historical status code 301 and 302 SHOULD NOT BE USED in modern websites.
+
+
+
+##### # Exceptation Mechanism: 100 Except and 417 Expectation Failed
+
+HTTP/1.1 introduce the exceptation mechanism, which allows the client to ask whether the server is willing to process the request by sending only the startline and headers beforehand.
+
+
+
+
 
 我们考虑这样一种情况: 某些时候服务器可能出于一些原因拒绝接受某个报文(可能是因为报文主体太大, 或者出现了其他服务器无法处理的情况), 这无疑浪费双方的网络资源, 因此客户端可以选择先“试探”一下服务器是否会接受报文, 这时只需要先把主体部分保存下来, 只发送报文的起始行和首部部分, 并且在首部中添加一个Except: 100 Continue字段,  告知服务器“如果你可以接受的话, 我接下来将发送该报文的实体部分”, 如果服务器可以接受, 则返回给客户端一个100 Continue状态码, 接着客户端就可以继续发送主体部分, 如果服务器不接受, 则返回给客户端一个417 Expectation Failed状态码, 客户端收到以后就不应该继续发送这个报文.
 
@@ -172,15 +222,13 @@ HTTP/1.0规范规定: 如果一个POST请求收到了302回复, 则应该到新U
 
 
 
-##### # Connection Management
-
-##### # Cache Strategy
+### 5. Connection Management
 
 
 
 
 
-
+### 6. Cache Strategy
 
 
 
@@ -188,7 +236,35 @@ HTTP/1.0规范规定: 如果一个POST请求收到了302回复, 则应该到新U
 
 
 
-##### # Evolution of HTTP
+
+
+
+
+
+
+### 7. Evolution of HTTP
+
+##### # HTTP/0.9
+
+
+
+##### # HTTP/1.0
+
+
+
+##### # HTTP/1.1
+
+
+
+##### # HTTP/2
+
+
+
+##### # HTTP/3
+
+
+
+
 
 HTTP/1.0标准的文档为RFC 1945
 
@@ -299,11 +375,17 @@ ident协议通常只用在可信任的组织内部, 在公共因特网中, 出�
 
 ##### # Definition
 
-Proxy is an entity between client and server, transferring package bewteen. Proxy works like the server for the client, while like the client for the server. Hence a proxy must implement both the functions.
+Proxy is an entity between client and server, transferring packages bewteen. Proxy works like the server for the client, and like the client for the server. Hence a proxy must implement both the functions.
 
 ```mermaid
-flowchart LR;
-Client <--> Proxy <--> Server
+stateDiagram
+state NetworkWithProxy{
+    Client --> Proxy
+    Proxy --> Server
+
+    Proxy --> Client
+    Server --> Proxy
+}
 ```
 
 
@@ -316,15 +398,15 @@ If the proxy is specialized to the one client, its the **private proxy**, otherw
 
 ##### # Difference between Proxy and Gateway
 
-Proxy and gateway both connect two entities in the network. The proxy connects two entities using same protocol (for example, HTTP proxy, connects two entities using HTTP protocol), while the gateway connects two entities using different protocols (for example, HTTP/POP gateway, or HTTP/E-mail gateway), by which we cloud use browser to send/receive e-mail.
+Proxy and gateway both connect two entities in the network. The difference is: proxy connects two entities using same protocol (for example, HTTP proxy, connects two entities using HTTP protocol), while the gateway connects two entities using different protocols (for example, HTTP/POP gateway, or HTTP/E-mail gateway), by which we could use browser to send/receive e-mail. This indicates that the proxy can be transparent in the network, and if we just take the proxy away the communication will still work, but not work for gateway.
 
-容易发现, 对于两个使用相同协议的实体而言, 代理并非必须的, 取消代理, 换成一个直连链路不影响它们的通信; 但对于使用不同协议的实体来说, 实现协议转化的网关则至关重要, 否则它们无法通信. 
-
-不过另一方面, 代理和网关之间的界限有时候也并不那么清晰. 由于客户端和服务器所使用的协议版本可能有所不同, 因此代理有些时候也需要做一些协议转换工作, 有时候代理甚至还实现了一些网关的功能, 例如FTP协议、SSL协议等等. 
+As most of other conceptual specifications in computer network, in the line blurs between proxy and gateway. For example, for the client and server who support different versions of HTTP, some protocol transformation might be done by the process, and some proxy even implement functions of gateway.
 
 
 
 ##### # Function of Proxy
+
+Proxy can monitor and convert all the data flows it
 
 我们知道proxy可以监视并修改所有流过它的网络流量, 因此代理可以起到许多非常强大的功能. 
 
