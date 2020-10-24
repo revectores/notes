@@ -14,7 +14,7 @@ As the entity connecting two different network, a router must holds two differen
 
 
 
-##### # Historical Classification
+##### # Historical IP Address Classification
 
 In the traditional design, IP address is divided into five types, type A, B, C are unicast addresses, type D is multicast addresses, and E is left for the future.
 

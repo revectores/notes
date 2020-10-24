@@ -99,7 +99,7 @@ Note that these propery classifications applied to the functions of methods defi
 
 ### 4. HTTP Status Code
 
-##### # Classifications
+##### # Status Code Classification
 
 **Status code** notify client with how the request has been processed. It's a decimal with 3-digits. The first digit shows the type of status code:
 
@@ -115,18 +115,18 @@ Note that these propery classifications applied to the functions of methods defi
 
 ##### # Utility Description
 
-| status code | default reason phrase | Description                                                  |
-| :---------: | :-------------------: | ------------------------------------------------------------ |
-|     200     |          OK           | Success. The interpretation of success depends on the reqeust method. |
-|     302     |         Found         | 资源已经被转移, 不在这个URL里了, 但我们为你提供了该资源现在的URL并且附在了header的Location字段中 |
-|     304     |     Not Modified      | 服务器进行了缓存判定, 并且告诉计算机中所储存的缓存还没有过期, 可以继续使用, 不必从我这里拿资源了 |
-|     400     |   Bad Request Error   | req报文中存在语法错误                                        |
-|     401     |     Unauthorized      | 未授权, 需要输入用户名和密码才可以访问                       |
-|     403     |       Forbidden       | Understand but not Allowed                                   |
-|     404     |       Not Found       | 没有找到对应的URL, 通常这个命令也会携带一个实体, 以便于客户端的应用程序提供给用户看, 因此404并不意味着没有实体 |
-|     406     |    Not Acceptable     | 服务器无法提供客户端所能够接受的MIME类型(在Accept字段中给出的)现代浏览器一般不会发生这类错误, 因为其Accept字段一般都设定成/, 即能够接受一切MIME类型 |
-|     500     | Interval Server Error | 服务器发生了不可预知的错误                                   |
-|     503     |  Server Unavailable   | 服务器目前不可用, 可以稍后再访问试试                         |
+|   status code   |                    default reason phrase                     | Description                                                  |
+| :-------------: | :----------------------------------------------------------: | ------------------------------------------------------------ |
+|       200       |                              OK                              | Success. The interpretation of success depends on the reqeust method. |
+| 301/302/307/308 | Moved Permanently/Found/Temporary Redirect/Permanent Redirect | The resource is moved to somewhere else, we provide the new URL in `Location` header. |
+|       304       |                         Not Modified                         | The cache is fresh.                                          |
+|       400       |                      Bad Request Error                       | Syntax Error in request message.                             |
+|       401       |                         Unauthorized                         | Username & Password required.                                |
+|       403       |                          Forbidden                           | Understand but not Allowed.                                  |
+|       404       |                          Not Found                           | Requested URL not found.                                     |
+|       406       |                        Not Acceptable                        | The server is unable to provide the MIME type that client excepted in header `Accept`. |
+|       500       |                    Interval Server Error                     | Unexpected error in server                                   |
+|       503       |                      Server Unavailable                      | Not available for now, try it latter.                        |
 The following reason pharse is the descriptive comment text of status code, which will not be processed, hence can be set at will.
 
 
@@ -152,13 +152,25 @@ As required by [RFC 2068#10.2.2](https://tools.ietf.org/html/rfc2068#section-10.
 
 
 
-##### # Redirection: 301 Moved Permanently, 302 Found, 307 Temporary Redirect, 308 Permanent Redirect
+##### # Redirection: 301, 302, 303, 307, 308
 
-All of the four status codes indicate a redirection and the destination URL `host` will be provided in the response header. 301 and 308 **redirect permanently**, and 308 does not permit the conversion from POST to GET during redirection. Similar rules applied to 302 and 307: **redirect temporarily**.
+HTTP provides three categories of redirections, temporary, permanent, and special:
 
-The only difference of the four status codes is the semantics: The search engine will remove the index of those redirected pages, while keep those temporarily.
+- Temporary redirects during site maintenance or downtime.
+- Permanent redirects to preserve existing links/bookmarks after changing the site's URLs, progress pages when uploading a file, etc.
+- Special redirections includes 300 Multiple Choice (Not used in common hence we omit this here) and 304 Not Modified (will be introduced in the cache mechanism).
+
+All of the four status codes indicate a redirection and the destination URL will be provided in the response header `Location`. 301 Moved permanently and 308 Permanent Redirect **redirect permanently**, 302 Found, 303 See Other, and 307 Temporary Redirect **redirect temporarily**.
+
+The redundancy of redirection codes comes from historical reason, 301, 302 and 303 are introduced in HTTP/1.0, some agents implement 301 and 302 to change the protocol from others to GET after redirection (although the protocols are not intended to require so), hence 307 and 308 are intoduced in HTTP/1.1 to reduce ambiguity. On the contrary, 303 See Other is intended to change the protocol from others to GET, normally used to redirect after a PUT or a POST, so that refreshing the result page doesn't re-trigger the operation.
+
+There is no difference for the user or even browser when processing those redirection: request the provided new URL again, that is, the only difference of the four status codes is the semantics. The search engine (ideally) will merge the information of those permanent redirected pages into new URL, while those temporarily are kept.
+
+This interpretation of temporary redirection provides possibility to construct URL hijacking: If we intentionally "temporary" redirects the URL-2 to URL-1, then the search engine will consider the traffic belongs to URL-2 instead of the actual content provider.
 
 Refer to [HTTP Redirect Codes for RESTful Services](https://tools.ietf.org/id/draft-hunt-http-rest-redirect-00.html), the historical status code 301 and 302 SHOULD NOT BE USED in modern websites.
+
+
 
 
 
@@ -166,54 +178,35 @@ Refer to [HTTP Redirect Codes for RESTful Services](https://tools.ietf.org/id/dr
 
 HTTP/1.1 introduce the exceptation mechanism, which allows the client to ask whether the server is willing to process the request by sending only the startline and headers beforehand.
 
+The client, with uncertainty, sends only startline and headers, add `Except: 100 Cotinue` on the header, if the server accepts the request (for now, based on the received headers), it returns `100 Continue` status code to encourage client to send the entire message, otherwise `417 Expectation Failed` status code should be given to tell the client abort subsequent sending.
 
+Although this process seems ideal, many problems arise in complex network environment, especically the existence of transparent proxies inside network, which leads to the backward compatibility problem, the solution of many problems are specified in [RFC7231](https://tools.ietf.org/html/rfc7231#section-5.1.1), while some other are still undefined behaviours:
 
+For the client:
 
+- Shall the client send request message if `100 Continue` is not received for a long time?
 
-我们考虑这样一种情况: 某些时候服务器可能出于一些原因拒绝接受某个报文(可能是因为报文主体太大, 或者出现了其他服务器无法处理的情况), 这无疑浪费双方的网络资源, 因此客户端可以选择先“试探”一下服务器是否会接受报文, 这时只需要先把主体部分保存下来, 只发送报文的起始行和首部部分, 并且在首部中添加一个Except: 100 Continue字段,  告知服务器“如果你可以接受的话, 我接下来将发送该报文的实体部分”, 如果服务器可以接受, 则返回给客户端一个100 Continue状态码, 接着客户端就可以继续发送主体部分, 如果服务器不接受, 则返回给客户端一个417 Expectation Failed状态码, 客户端收到以后就不应该继续发送这个报文.
+    > A client that sends a 100-continue expectation is not required to wait for any specific length of time; such a client MAY proceed to send the message body even if it has not yet received a response.
+    >
+    > Furthermore, since 100 (Continue) responses cannot be sent through an HTTP/1.0 intermediary, such a client SHOULD NOT wait for an indefinite period before sending the message body.
 
-上面所叙述的双方的交流过程是很理想的, 但是实际的网络环境中总会出现各种各样的复杂问题, 例如, 如果客户端长时间没有收到服务器的100 Continue状态码, 是否应该直接发送报文? 答案是肯定的. 如果服务器在发送响应之前就收到了主体部分, 就说明上面这一情况发生: 客户端已经没有耐心直接发送了主体部分, 这时, 如果服务器是准备发送100的, 那么此时就不必再发送100了, 直接把主体部分接受下来并且发送最终处理的状态码即可(例如200 OK), 但如果服务器是准备发送417的, 这就说明服务器并不愿意接受它, 就算发过来了也只能扔掉.
+- Shall the client abort the request if `417 Expectation Failed` is received?
 
-有些设计不良的服务器会不合时宜地胡乱发送非预期的100 Continue(即使客户端根本就没有发送相应的Except要求), 这并不是不可能出现的, 因而是客户端应用程序员应当考虑的情况, 合理的做法是将这些100都忽略掉.
+    Answering to this problem seems to be simple: Don't send since that's what the status code tells, but:
 
-另外值得注意的是, 由于现在还有部分应用程序使用的是较早的HTTP/1.0版本, 这些应用程序并不知道要如何处理100请求, 考虑以下两种情况: 1.1client--1.0server和1.0 client--1.1server. 如果一个1.1的客户端向1.0的服务器发起了试探请求(即在headers中加入Except: 100 Continue字段)会发生什么? 我们注意到Expect首部实际上在HTTP/1.0版本中就已经存在了, 但1.0版本中100 Continue这个字段是不合法的, (如果服务端应用程序遵守标准来设计的话)服务器对于任何自己无法满足的(包括自己无法理解的)Expect都应该返回一个417, 因此客户端就可以知道服务器不愿意接受这个报文.
+    > A client that receives a 417 (Expectation Failed) status code in response to a request containing a 100-continue expectation SHOULD repeat that request without a 100-continue expectation, since the 417 response merely indicates that the response chain does not support expectations (e.g., it passes through an HTTP/1.0 server).
 
-1.0 client--1.1server的情况是比较奇怪的, 既然客户端没有发出100 Expect, 服务器也不应该给出100状态码, 因此这种情况只会存在于上面提到的“设计不良的、乱发100的server”, 1.0客户端收到这种不明觉厉的状态码最好的处理方式就是扔掉.
+For the server:
 
-有代理存在的情况如何呢? 如果一个proxy收到了客户端发来的一个含有100期望的请求, 这时候它需要对下一跳服务器的版本进行考察: 如果下一跳服务器是支持HTTP/1.1的, 那么它可以直接转发这个请求, 但如果明确知道下一跳服务器是不支持HTTP/1.1的, 它就可以代替服务器向客户端返回一个417 Expectation状态码, 以免去代理和服务器之间通信的麻烦; 代理似乎也可以采取另一个方法: 向客户端返回一个100状态码(假装这是服务器发的), 然后将客户端兴冲冲发来的主体部分再转发给服务器. 但这种奇怪的做法会产生很大的问题: 我们知道Except 100是用来检验的, 那么如果服务器发送了100, 就意味着它**一定**会接受这个后续报文, 但实际上这个100只是proxy对客户端的“欺骗”, 如果服务器实际上并不能接受这个报文而将其丢掉了(并且返回一个错误码, 代理并不处理这个错误码), 客户端受到错误码必然会很困惑: 明明你都给了100为什么还不能接受? 面对这种垃圾的“热心肠”代理实现, 客户端应用程序员可能就不得不考虑在收到了100后却仍然被服务器拒收报文的可能.
+- Shall the server sends `100 Continue` if it has already received the entire message?
 
-如果代理并不知道下一跳服务器是否支持HTTP/1.1, 那么最好还是将报文原样转发出去, 然后再将收到的100或是417发送给客户端, 这时候有趣的事情在于: 代理收到了报文之后就可以通过这里的100判断出下一跳服务器是必然支持HTTP/1.1的, 因此就可以在状态表中对下一跳服务器的信息进行更新, 但如果收到的是417, 则代理就并不清楚这是因为下一条服务器理解但拒绝接收, 还是根本就不理解, 因此无法从中获得有关下一跳服务器的信息(但可能可以从报文的其他部分中获得, 毕竟报文内容是很丰富的, 不仅仅只有状态码).
+    > A server MAY omit sending a 100 (Continue) response if it has already received some or all of the message body for the corresponding request, or if the framing indicates that there is no message body.
 
-从以上讨论中我们可以发现, 代理维护一个关于下一跳服务器的状态表是十分有用的.
+For the proxy:
 
-上面所讨论的代理都是被动地接受100期望, 有些代理甚至还会**主动将报文添加上100期望**和服务器通信, 这时候代理一般都只代表HTTP/1.0或之前的客户端(因为如果代理知道客户端的版本号高于HTTP/1.1却没有添加100期望, 那就说明客户端并不希望进行试探, 自己再自作多情试探是一个很没有必要的做法, 但HTTP/1.0之前的却不一样, 它们不知道现在1.1以后版本所具备的先进技术, 一个很大的报文会浪费大量得的网络资源, 因此“我有必要为网络资源的节约利用负起责任”), 这种代理有着高度的社会责任感, 但应当注意在实现时不要将收到的100 Continue状态码错发给了客户端, 以免引起不必要的麻烦.
+- What should a proxy do when it receive a `Expect: 100 Continue` header?
 
-
-
-##### # 301 HTTP/1.0: Redirect and 302 Redirect
-
-301 Moved Permanently和302 Found都是在浏览器试图通过某一个URL GET资源时, 服务器告知客户端“这个资源不在这里”, 并且在Location中给出另外一个URL以供访问.
-
-提供重定向的意义是显见的, 由于搜索引擎的索引具有滞后性, 因此一旦网页被移动到一个新的地址, 那么搜索引擎中所抓取的原先的URL就失效了, 用户在访问这个资源时只能收到一个404 Not Found(包括用户收藏夹中的网页也是一样), 导致网站白白丧失了流量, 这显然是站长不愿意看到的, 因此需要提供重定向的支持.
-
-301和302的区别在于其所表示的意义不同: 301表示“这个资源已经被**永久**转移走了”, 而302则表示这个跳转只是临时的. 实际上对于浏览器用户来说, 这两种跳转并没有什么区别, 都是地址栏中的URL突然变成了另外一个, 浏览器一般也不会因为以前收到了301, 就对用户输入的被301过的地址在本地直接进行处理, 那么二者区别的实在性在哪里体现呢? 目前二者只在搜索引擎收录的过程中体现去差异.
-
-对于301来说, 搜索引擎既然知道资源已经完全被移走, 就没有必要再收录这个URL, 因此所收录的URL和资源都是重定向后的, 而对于302, 搜索引擎认为这个跳转只是暂时的, 因此虽然爬的是新URL中的资源, 但收录的却还是原来的URL. 这就使得302状态码提供了**URL劫持**的可能, 如果有人弄了一个新的URL B使其302到URL A, 然而搜索引擎在摘录URL B时, 显示的虽然是A的内容, 保存的却是B的URL, 这就导致A的内容白白给B作了引流, 自己却丧失了原本可以获得的流量. 因此搜索引擎对302跳转是很讨厌的, 如何避免URL劫持也是搜索引擎需要解决的一个问题.
-
-
-
-##### # HTTP/1.1: 302, 303, 307
-
-如果一个GET请求收到了302的回复, 那么只需要对新URL重新发起GET就可以了.
-
-HTTP/1.0规范规定: 如果一个POST请求收到了302回复, 则应该到新URL中去发送一个**GET**. 而HTTP/1.1规范规定: 服务器应当对POST请求和GET请求作出不同的状态码回复, 对于POST请求的重定向使用303状态码, 而对于GET请求的重定向要使用307状态码.
-
-现在假设我是一个HTTP/1.1服务器, 收到了一个需要做重定向的请求, (注意req报文的起始行已经给出了客户端所使用的HTTP版本号是1.0还是1.1, 因此client版本判定是一个非常simple事情), 对于1.0版本的客户端, 无论是GET重定向还是POST重定向都只需要发送302状态码, 而对于1.1版本的客户端, 由于它可以理解303和307的区别, 因此需要对临时的GET重定向发送307状态码(对永久的GET重定向仍然发送301), 而对POST重定向发送303状态码. 这表明了302实际上就只在HTTP/1.0客户端才可能出现, 因此我们可以利用所收到的重定向状态码来判断客户端的HTTP版本号.
-
-由此我们容易体会到一件事情: 向下兼容是个大坑.
-
-对于500错误码我们有一个问题: 在使用shadowsock挂PAC模式时有时会出现Internal Privoxy Error. 这是为什么? 
-
+    > A proxy MUST, upon receiving an HTTP/1.1 (or later) request-line and a complete header section that contains a 100-continue expectation and indicates a request message body will follow, either send an immediate response with a final status code, if that status can be determined by examining just the request-line and header fields, or begin forwarding the request toward the origin server by sending a corresponding request-line and header section to the next inbound server.  If the proxy believes (from configuration or past interaction) that the next inbound server only supports HTTP/1.0, the proxy MAY generate an immediate 100 (Continue) response to encourage the client to begin sending the message body.
 
 
 
@@ -228,85 +221,47 @@ HTTP/1.0规范规定: 如果一个POST请求收到了302回复, 则应该到新U
 
 
 
-### 6. Cache Strategy
 
 
+### 6. Evolution of HTTP
 
+##### # HTTP/0.9: One Line Protocol
 
+HTTP/0.9 is the first version of HTTP, the version number is assigned after HTTP/1.0 is introduced to distingulish it from new version.
 
+`GET`, as the only supported method, followed by the path(not URL, as both the protocol, server, and port are unnecessary once connected to the server), constructs the entire request message:
 
+```http
+GET /page.html
+```
 
+The response message contains only pure HTML page, no status code, no type header, only HTML contained.
 
-
-
-
-
-
-### 7. Evolution of HTTP
-
-##### # HTTP/0.9
+There is no necessary to provide backward compatibility to the HTTP/0.9 nowadays.
 
 
 
 ##### # HTTP/1.0
 
+See [RFC 1945](https://tools.ietf.org/html/rfc1945).
+
 
 
 ##### # HTTP/1.1
+
+HTTP/1.1 releases its first specification [RFC 2068](https://tools.ietf.org/html/rfc2068) in January 1997, which is obsoleted by [RFC 2616](https://tools.ietf.org/html/rfc2616) in June 1999, and then it is devided into [RFC7230](https://tools.ietf.org/html/rfc7230), [RFC7231](https://tools.ietf.org/html/rfc7231), [RFC7232](https://tools.ietf.org/html/rfc7232), [RFC7233](https://tools.ietf.org/html/rfc7233), [RFC7234](https://tools.ietf.org/html/rfc7234), [RFC7235](https://tools.ietf.org/html/rfc7235) after 15 years in June 2014.
 
 
 
 ##### # HTTP/2
 
+==TODO: Add HTTP/2 features==
+
 
 
 ##### # HTTP/3
 
-
-
-
-
-HTTP/1.0标准的文档为RFC 1945
-
-HTTP/1.1最初的RFC的版本是1997年1月发布的RFC2608, 后来在1999年6月发布2616取而代之, 在2014年则又重述了其中语义不清的部分, 将HTTP/1.1标准划分为7230~7235五个文档.
-
-HTTP/0.9
-
-HTTP/0.9是最早的HTTP版本, 这个版本号显然是后来人们开发出HTTP/1.0以后才人为加上的, 表示这是一个很原始、很粗糙的版本. HTTP/0.9的报文格式和之后的版本有很大的差异, 在其req报文中只有方法名称和目标URL, 下面的部分全部都没有, 相当于只是一个后来版本的起始行去掉了版本号, 而其resp报文只有主体部分(entity-body), 没有起始行和首部. 因此其格式大致是这样的
-
-```http
-method  request-URL
-```
-
-```http
-entity-body
-```
-
-这样简洁的报文格式显然无法完成后来HTTP所支持的大部分功能, 很快就被废弃了. 现在基本上不会有谁再使用HTTP/0.9协议写应用程序. 相反, 为HTTP/0.9C/S提供兼容反而会导致一系列的问题, 有时会引起安全问题.
-
-但作为HTTP协议的草稿, 0.9版本显然是有其历史意义的, 从报文格式的演化来看, 0.9版本中两类报文的组分都被新协议采取了, 在新协议中req和resp报文的格式变得非常类似.
-
-HTTP/1.1
-
-【首部】
-
-首部(headers)由零个或多个键值对构成, 键和值之间由冒号(或者是冒号+空格)分开, 不同首部占据则不同的行. headers与主体之间由CRLF分隔. 
-
-【主体】
-
-主体没有特定的固定格式, 可以是由任意形式的数据所构成的数据块. 
-
-
-
-
-
-### 3. Cookie
-
-我们知道HTTP连接是一种**无状态(stateless)**的连接, 也就是说服务器不会记住曾经访问过它的客户端, 只是简单地将其作为一个全新的连接进行处理, 这样做减轻了服务器的负担并且使得协议容易实现, 但是这确实会带来一些不便, 例如, 对于一些需要登录的网站, 客户每一次重新的打开网站就必须重新登录一次, 而无法保持其登录状态.
-
-为了解决这个问题, HTTP设计了Cookie机制, 当客户端发送一个(某种希望服务器记住它的)请求时, 服务器在响应报文首部中添加一个`set-cookie`字段, 客户端收到这个字段并保存到自己维护的cookies文件当中, 当客户端下一次进入这个网站时, 只需要在请求报文首部中添加一个Cookie字段, 就可以告知服务器自己的身份信息, 从而实现了服务器记住客户端身份的功能.
-
-然而Cookie会带来许多安全问题, ==TODO: ADD Security Problems of Cookies in Security Part.==
+The next major version of HTTP, HTTP/3, will use [QUIC]() instead TCP/TLS for the transport layer portion.
 
 
 
@@ -314,6 +269,13 @@ HTTP/1.1
 
 
 
+### 7. Cookie
+
+We've known that HTTP is designed to be stateless connection, that is, in the protocol's perspective the server will not remember whether a client is an old friend or a new one, which leads to some inconvience as the Web developed as more and more complex. For example, stateless makes it is nearly impossible for login: the user has to log in each time for any new requests that requires authentication.
+
+Cookie is introduced to solve this problem: When the client sends some request and wish itself to be memorized, server appends `Set-Cookie` in response header and client stores it in the local `cookies` file. Next time the client requests the same server, it use the `Cookie` in request header to tell the server the identity of client.
+
+Security and privacy problems are also introduced as Cookie.
 
 
 
@@ -321,10 +283,9 @@ HTTP/1.1
 
 
 
+### 8. HTTP Server
 
-### 5. HTTP Server
-
-HTTP使用Client/Server结构, 服务器是请求的接受者, 当客户端向服务器发起一个请求时, 服务器通常需要进行以下7个步骤的操作: 
+Normally the HTTP server process a request by the following steps:
 
 ```mermaid
 flowchart LR;
@@ -333,37 +294,19 @@ A["Establish<br/>Connection"]-->B[Receive<br/>Request]-->C[Process<br/>Request] 
 
 ```
 
-以下详述在这几个过程中所涉及的具体技术.
 
 
+##### # Connection Establishment
 
-##### # Connection Establishment and Authority Mechanism
+Server accepts and add the client to the connection list when connection request from client arrives. The server might refuse the connection for multiple reason:
 
-当客户端向服务器发起连接请求时, 服务器可以接受之并将其加入自己维护的连接列表当中(一个服务器通常都需要与众多的客户端建立连接). 服务器可以**随意**拒绝或者关闭连接, 但一般不会乱来, 通常是由于客户端IP地址是未经认证的, 或者是已知的恶意客户端, 服务器才会拒绝连接.
+- The client is identified as a malicious client.
+- The client establishes too many connection in a short time (identified as DDoS).
+- The client does not pass the authorization.
 
-在建立连接时服务器很容易从IP数据包种提取出源IP地址, 有些时候服务器可以采用一种称为**反向DNS**(reserve DNS)的技术从根据IP地址解析出客户端的**主机名**, 但是一般不会这么做, 因为反向DNS的查询通常都要耗费很长时间.
+The typical model about how the server to handling request in the server's operating system is described as: The server mantains one or multiple listener processes/threads to receive requests, once the request arrives, it is first accepted by one listener process/thread, then a process-fork-and-exec/thread-creation process is executed, a new process/thread is created to process the request and terminated after compete processing.
 
-如果对仅仅得到主机名不满意, 还希望得到用户名(username), 以便于对同一台主机上的不同用户进行识别, 则可以使用**ident协议**. 如果客户端支持ident协议的话, 则会在其113端口上监听ident request, 服务器建立到113端口的连接并发送询问请求, 希望得到与HTTP连接对应的用户名, 客户端则返回包含有自己用户名的相应.
-
-ident协议通常只用在可信任的组织内部, 在公共因特网中, 出于安全的考量通常的PC机都不会支持ident协议. 因此在某些含有ident字段的日志格式(例如Apache的日志, 其第二个字段就是ident字段)中, ident字段通常仅仅是一个连字符"-".
-
-由于服务器需要同时处理很多客户端的连接请求, 因此通常会采取多进程(多线程)和复用I/O的技术手段, 我们下面考虑四种情况.
-
-单线程、不复用I/O的服务器每一次只能处理一个请求, 在当前的请求处理完毕后才能够处理下一个, 而在此过程中的所有连接都会被忽略, 这显然会导致严重的性能问题, 只适用于低负荷的服务器以及像type-o-serve这样的诊断工具.
-
-多线程、不复用I/O的服务器
-
-
-
-
-
-##### # Request Message Receiving
-
-由于请求报文的格式是固定的, 服务器只需要根据各个字段的意义将报文解释出来就可以了, 注意由于网络随时可能出现延迟, 因此服务器在接受报文时有必要分配一块内存作为缓冲区域, 直到收到足以进行解析的数据为止.
-
-某些服务器使用便于操作的数据结构来储存报文, 这称为报文的**内部表示法**, 例如
-
-<img src="internal_representation.png" style="zoom:50%;" />
+Multiple information from client can be achieved if the server wishes. Except IP address, the **reserve DNS** technique makes it possible to resolute the host name from IP address, but this costs a lot of time hence is not proceed normally. **Identification Protocol(ident)** provides a method to get the username from client, the client must listen ident request on 113 port. Identically this is not used normally since most of the host does not open and listen for ident on public Internet, only used in trustable local network. This explained why the `ident` field in some server logging information (such as Apache's) is always a hyphen `-`.
 
 
 
@@ -371,21 +314,14 @@ ident协议通常只用在可信任的组织内部, 在公共因特网中, 出�
 
 
 
-### 6. Proxy
+### 9. HTTP Proxy
 
 ##### # Definition
 
-Proxy is an entity between client and server, transferring packages bewteen. Proxy works like the server for the client, and like the client for the server. Hence a proxy must implement both the functions.
+Proxy is a network entity between client and server, transferring packages bewteen. Proxy works like the server for the client, and like the client for the server. Hence a proxy must implement both the functions.
 
-```mermaid
-stateDiagram
-state NetworkWithProxy{
-    Client --> Proxy
-    Proxy --> Server
-
-    Proxy --> Client
-    Server --> Proxy
-}
+```
+Client <---> Proxy <---> Server
 ```
 
 
@@ -406,66 +342,19 @@ As most of other conceptual specifications in computer network, in the line blur
 
 ##### # Function of Proxy
 
-Proxy can monitor and convert all the data flows it
+Proxy can monitor and convert all the data flows it, hence we can utilize proxy to implement powerful functions:
 
-我们知道proxy可以监视并修改所有流过它的网络流量, 因此代理可以起到许多非常强大的功能. 
-
-一个比较简单的应用就是黄色网站过滤. 如果我们在客户端浏览器和Internet之间安上一个代理, 并且其能识别其中属于黄色站点的IP地址, 那么代理就能够拒绝属于此类IP的访问(直接丢包), 从而实现万恶的绿色上网功能. (这里有一个值得讨论的问题: 我们知道在解析DNS的时候也是需要向DNS server发DNS request的, 那么代理能否存在于客户端和DNS服务器之间, 从而在DNS解析阶段就直接实现过滤呢? 还是说代理只能作用于HTTP协议而不能作用于DNS? 请进一步明确)
+- Website filter. The proxy between client and server is able to monitor the destination the client try to access, hence it can simply drop the message or pretend as the real server and response with 5xx when the destination is in the blocked list.
 
 
 
 ##### # Forward Proxy and Reverse Proxy
 
-通常, 作为client的浏览器在设置代理时, client清楚这个代理的存在, 知道自己是在借助一个中间实体访问server, 但是server则不知道, 它只是把代理当做client, 像这种客户端知道而服务器不知道的代理, 我们称为**正向代理(forward proxy)**.
+Based on the transparency, we can classify proxies as two types: if the proxy is set by the client and transparent to the server, it is a **forward proxy**, otherwise if it is set by the server and transparent to the client, it is a **reverse proxy** or **surrogate**.
 
-server方面则可以采取一种称为**反向代理(reverse proxy)**或称为**替代物(surrogate)**的技术, 这项技术使得当client试图访问server上的某个资源时, 实际上接受应答的是反向代理, 是它代替服务器和客户端进行交互.
+The functions of forward proxy includes:
 
-正向代理和反向代理差异的关键之处在于是C/S体系的哪一方主动设置并对另一方透明的. 正向代理的作用包括
-
-1. 身份隐藏. 正向代理(在攻击中)最重要的一个作用在于对服务器隐藏访问者(客户端)的真实身份, 从而在服务器上无法直接得到访问者的IP, 这样, 只要正向代理的安全性可以得到保证(例如抓一堆肉鸡), 则攻击者的IP就是安全的.  值得注意的是FP和VPN之间的区别(其实我也不是很懂)
-2. 限访绕过和加速. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 7. Cache
-
-缓存是可以自动保存常见文档副本的HTTP设备.
-
-当客户端向缓存发送一个请求时, 可能会出现以下几种情况: 
-
-1. 缓存中有响应报文的副本, 并且副本没有过期, 可以直接把缓存发送给客户端, 这种情况称为**缓存命中(cache hit)**.
-2. 缓存中有响应报文的副本, 但是副本已经过期, 必须对副本进行**再验证(revalidation)**, 向服务器发送一个请求检验自己的副本和新的文档是否一致, 如果一致, 则把报文发送给客户端, 这种情况称为**再验证命中(revalidate hit)**或**缓慢命中(slow hit)**; 而如果新的文档和原来的相比已经发生了改变, 则缓存需要从服务器中下载新文档并转发给客户端, 这种情况称为**再验证未命中(revalidate miss)**; 更糟糕的是服务器如果服务器文档已经被删除, 服务器返回404 Not Found相应, 则缓存也会删除其副本.
-3. 缓存中没有相应报文的副本, 将请求报文转发给服务器, 下载相应并转发给客户端, 这种情况称为**缓存未命中(cache miss)**.
-
-
-
-**缓存的新鲜度检测机制**
-
-保质期首部`Cache-control, Expires`
-
-服务器在响应报文中常常会给文档设定一个过期的时间, 以便于网络上的缓存实体判断报文的有效期从而能够有效地进行新鲜度检测, 在缓存文档过期之前, 缓存可以以任意频率使用这些副本, 而一旦过期就必须重新与服务器联系. 
-
-**Expires**首部是在HTTP/1.0+版本中规定的, 它指定了一个过期的绝对时间(**格林尼治标准时间GMT**); 而在HTTP/1.1中则使用相对时间(以秒为单位)的**Cache-control**首部. 后者的时间是相对于服务器生成该文档时间(被写入了**Date**首部中)的偏移量. 考虑到兼容性, 许多站点在响应报文中同时写了两个首部. 
-
-
-
-服务器再验证
-
-当缓存收到客户端的请求, 发现对应的响应报文已经过了保质期, 就必须要向服务器进行核对, 这个过程称为**服务器再验证**, 向服务器询问文档内容是否发生了变化. 如果发生了变化, 则缓存必须获得一份新的副本, 覆盖旧文档并发送给客户端; 如果没有发生变化, 则缓存只需要获得一份**新的首部**, 首部中包含有新的Date和保质期数据, 并且替换旧文档中的首部. 
-
-
+1. Identity hiding. By accessing through a forward proxy, the client can prevent the server from getting its real IP address and other network information.
 
 
 
@@ -477,18 +366,12 @@ server方面则可以采取一种称为**反向代理(reverse proxy)**或称为*
 
 ##### # HTTP-NG
 
-HTTP最初只是被设计来作为访问分布式服务器上的多媒体资源的一个协议, 但在不断的发展中HTTP已经逐渐成为了各种远程访问操作的统一载体, 原来的HTTP被注入了各种不同的扩展功能, 这些发展已经远远超出了最初协议设计者的预料. 
+W3C establish **HTTP-NG(HTTP Next Generation)** project to solve the problems arised as the HTTP developed and extended. The core idea of HTTP-NG is layering HTTP into three layers:
 
-在这样的背景下, 1997年夏天W3C启动了一个新项目, 希望构筑一个新的HTTP版本, 以解决HTTP在发展中存在的一些问题, 这个版本被称为**HTTP下一代系统**(**HTTP-NG**). 虽然该项目小组现在已经解散, 拟定的方案大概也不会再得到应用(现在比较热的是HTTP2.0方案), 但我们(也许)仍然可以从HTTP-NG的思路中挖掘一些对于现有问题的可能解决方案.
+- Web Application Layer. This layer is where the application logic lies.
+- Remote Invocation Layer. This layer aim to provide a general-purpose request/response interface framework.
+- Message Transport Layer. This layer foucs on the transmission of message, regardless of the interpretation.
 
-HTTP-NG的核心思想是将HTTP协议进一步模块化, 并自下而上地划分为三层, 就像网络体系结构那样: **报文传输层(message transport layer)**、**远程调用层(remote invocation layer)**和**Web应用层(Web application layer)**.
-
-报文传输层专注于考虑报文的有效传输, 不考虑报文的含义, 并且可以支持多种底层的协议栈, 不仅仅局限于传统HTTP所要求的TCP协议, 从而可以更灵活地在多种环境中应用HTTP. NG工作组的大部分精力都放在开发报文传输层的协议**WebMUX协议**上, 该协议可以**复用一条TCP连接**, 从而**并行**地传输多条报文, 从而对以不同速度产生和消耗的报文进行高效的分组, 提高报文传输的效率. 
-
-远程调用层提供一个通用的请求/相应框架, 使得客户端能够通过此框架远程调用服务器操作的接口. 
-
-Web应用层是实现应用程序逻辑的层次. 
-
-
+The most work of HTTP-NG working group is developing the messgae transport layer protocol **WebMUX**, which allows a TCP connection to be reused and transmit multiple messages on one connection to improve performance.
 
 
