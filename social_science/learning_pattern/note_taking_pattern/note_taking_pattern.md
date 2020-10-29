@@ -1,4 +1,4 @@
-# Learning Patterns
+# Note Taking Pattern
 
 
 
@@ -8,7 +8,7 @@ The core idea of Cornell notes encourage to devide the notes into two parts: **r
 
 This note-making pattern emphasize the reviewing function of notes, and constructing mechanism to avoid the meaningless re-read, which has been proved to be extremely inefficienct learning method^[1]^.
 
-> In our practice, the reviewing function has been taken over by the [unittest system](), while this approach still work if the notes-making process are executed on the paper.
+> In our practice, the reviewing function has been taken over by the unittest system, while this approach still work if the notes-making process are executed on the paper.
 
 
 

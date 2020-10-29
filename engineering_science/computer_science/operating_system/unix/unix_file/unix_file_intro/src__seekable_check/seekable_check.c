@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 /*
+Usage:
 $ ./a.out < /etc/passwd
 seek OK
 $ cat < /etc/passwd | ./a.out

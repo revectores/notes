@@ -14,7 +14,6 @@ The signal set of all time shifting of $\delta[n]$ is **orthogonal**:
 
 $$
 \delta[n-k]\delta[n-m] =
-
 \left\{
 \begin{array}{ll}
 \begin{align}

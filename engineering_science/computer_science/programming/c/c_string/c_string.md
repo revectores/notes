@@ -38,7 +38,7 @@ Becaused the string is an array, and an array it not allowed to operate assignme
 
 Noticed that C-style string is no more than an array, which means all the function applied to the array can be also applied in the string, one thing needs to be care about is still the suffix zero.
 
-```c++
+```c
 char s[] = "Hello";
 cout << sizeof(s)/sizeof(s[0]);  // 6
 // This count in the final 0. But string function strlen will ignore it:
@@ -47,18 +47,18 @@ cout << strlen(s);		// 5
 
 Besides `strlen`, there're some other function for string which shown in the following.
 
-- `strcpy` to copy the string into another and `strcat` implements the concatenation, both avoiding the bad-looking `for` loop.
+`strcpy` to copy the string into another and `strcat` implements the concatenation, both avoiding the bad-looking `for` loop.
 
-```c++
+```c
 char s1[] = "Hello"; char s2[20];
 strcpy(s2, s1);  // Copying s1 into s2, Now s2 = "Hello".
 // Notices the assignment-like sequence.
 strcat(s2, s1);  // Now s2 = "HelloHello"
 ```
 
-- `strcmp` to compare two string by the dictionary sequent. No, it's not possible to pass the third parameter to make the comparsion standard user-defined.
+`strcmp` to compare two string by the dictionary sequent. No, it's not possible to pass the third parameter to make the comparsion standard user-defined.
 
-```c++
+```c
 char s1[] = "Hello"; char s2[] = "Hi";
 cout << strcmp(s1, s2);		// -4
 /* This is because 'e'-'i' = -4. Which means this function no only gives the comparsion result but quantify it. */
@@ -70,5 +70,5 @@ char s4[] = {'H', 'e', 'l', 'l', 'o', '\1'};
 cout << strcmp(s4, s3);		// -96
 ```
 
-- `strch` and `strstr` provide the searching function, both of them returns a pointer to the first occurance of character/string in the string.
+`strch` and `strstr` provide the searching function, both of them returns a pointer to the first occurance of character/string in the string.
 

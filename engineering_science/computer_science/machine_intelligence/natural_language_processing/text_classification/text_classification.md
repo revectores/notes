@@ -67,7 +67,7 @@ The word of bags usually are too large to use, we should do features selection b
 
 Convential machine learning models for text classification:
 
-- [Naïve Bayes]()
+- [Naive Bayes]()
 - [Logical Regression]()
 - [SVM]()
 - [CNN]()
@@ -80,7 +80,7 @@ Convential machine learning models for text classification:
 
 ### 3.  Classification
 
-##### # [Naïve Bayes Algorithm]() for Text Classification
+##### # [Naive Bayes Algorithm]() for Text Classification
 
 Recall Naïve Bayes Algorithm which simply applies the Bayes' Rule to compute all the inverse probability and pick the maxmium one as prediction:
 $$

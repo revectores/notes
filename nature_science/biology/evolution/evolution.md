@@ -1,4 +1,4 @@
-# Theory of Evolution
+# Evolution
 
 ##### # Natural Selection of Phenotype
 

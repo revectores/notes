@@ -1,5 +1,12 @@
 # Information Theory
 
+$$
+\newcommand{\X}{\mathcal X}
+\newcommand{\Y}{\mathcal Y}
+$$
+
+
+
 ##### # Information Entropy
 
 For the random variable $X$ with its probability density function $p(x)$, we define the **information entropy** of $X$ as
@@ -10,6 +17,17 @@ The base $a$ defines the unit of information entropy, we use $a=2$ for computer 
 
 
 
+
+
+##### # Mutual Information
+
+The **mutual information(MI)** or **transinformation** is a measure of the mutual dependence between the two variables. More specifically, it quantifies the "amount of information" obtained about one random variable through observing the other random variable.
+
+The mutual information of two jointly discrete random variables $X$ and $Y$ is calculated as a double sum:
+$$
+I(X;Y) = \sum_{y\in\Y}\sum_{x\in\X} p_{(X, Y)}(x, y) \log \left( \frac{p_{X, Y}(x, y)}{p_X(x)p_Y(y)} \right)
+$$
+where the $p_{(X, Y)}$ is the joint probability mass function of $X$ and $Y$, and $p_X$ and $p_Y$ are the marginal probability mass functions of $X$ and $Y$ respectively.
 
 
 

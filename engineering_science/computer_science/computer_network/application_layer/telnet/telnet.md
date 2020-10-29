@@ -1,6 +1,5 @@
-# TELNET
+# Telnet
 
-telnet协议实现了一个以命令行的形式登录到远程终端的功能(随着远控软件的泛滥, 例如Windows下的远程桌面mstsc的广泛发展, telnet已经不再实用了), 以远程终端作为服务器而本地主机作为客户端, 建立TCP上. 其关键(难点)和众多协议一样, 就是兼容不同平台的差异, 例如回车符号的差异等等. 
+**Telnet(teletype network)** implements the remote command line interface, now it is obsoleted by SSH due to its security problem.
 
-
-
+The core difficult of implementation is compatibility among heterogeneous cmputer system, such as the different types of character sets.

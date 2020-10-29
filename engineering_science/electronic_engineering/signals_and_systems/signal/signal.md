@@ -79,15 +79,19 @@ Notice that there are $n_2-n_1+1$ numbers in $[n_1, n_2]$ instead of $n_2-n_1$.
 In the infinity section, the **total energy** of them are
 
 $$
-E_{\infty} = \int_{-\infty}^{+\infty}|x(t)|^2 \text{d}t = \lim_{T \rightarrow \infty} \int_{-T}^{T} |x(t)|^2 \text{d}t \\~\\
-E_{\infty} = \sum_{-\infty}^{+\infty}|x[n]|^2 = \lim_{N\rightarrow \infty} \sum_{-N}^{+N} |x(n)|^2
+\begin{align}
+&E_{\infty} = \int_{-\infty}^{+\infty}|x(t)|^2 \text{d}t = \lim_{T \rightarrow \infty} \int_{-T}^{T} |x(t)|^2 \text{d}t \\~\\
+&E_{\infty} = \sum_{-\infty}^{+\infty}|x[n]|^2 = \lim_{N\rightarrow \infty} \sum_{-N}^{+N} |x(n)|^2
+\end{align}
 $$
 
 and the average power in the infinite section are
 
 $$
-P_{\infty} = \lim_{T \rightarrow \infty} \cfrac{1}{2T} \int_{-T}^{T} |x(t)|^2 \text{d}t \\~\\
-P_{\infty} = \lim_{N\rightarrow \infty} \cfrac{1}{2N+1} \sum_{n=-N}^{+N} |x(n)|^2
+\begin{align}
+& P_{\infty} = \lim_{T \rightarrow \infty} \cfrac{1}{2T} \int_{-T}^{T} |x(t)|^2 \text{d}t \\~\\
+& P_{\infty} = \lim_{N\rightarrow \infty} \cfrac{1}{2N+1} \sum_{n=-N}^{+N} |x(n)|^2
+\end{align}
 $$
 
 We use the the total energy $E_{\infty}$ and average power $P_{\infty}$ over the infinity section to classify the singals:

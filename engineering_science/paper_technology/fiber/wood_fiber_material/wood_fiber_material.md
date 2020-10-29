@@ -1,4 +1,4 @@
-### 1. Wood Fiber Material
+# Wood Fiber Material
 
-分为针叶材和阔叶材两类. 我国可用于造纸的针叶材主要有: [云杉]()、[冷杉]()、[铁杉]()、[红松]()
+The wood used as the fiber material includes [hardwood](https://en.wikipedia.org/wiki/Hardwood) (deciduous) trees and [softwood](https://en.wikipedia.org/wiki/Softwood) (coniferous) trees. [Picea asperata](https://en.wikipedia.org/wiki/Picea_asperata), [Fir](https://en.wikipedia.org/wiki/Fir), [Tsuga chinensis](https://en.wikipedia.org/wiki/Tsuga_chinensis) and [Pinus koraiensis](https://en.wikipedia.org/wiki/Pinus_koraiensis) are the primary wood fiber material in China.
 

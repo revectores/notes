@@ -1,4 +1,4 @@
-# MPI
+# C MPI
 
 ##### # Demo MPI Code
 

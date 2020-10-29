@@ -1,4 +1,4 @@
-# Unittest for New Features in Python 3.9
+# Python 3.9 New Feature
 
 ##### # Basic Data Types
 
@@ -12,11 +12,4 @@ dict1 |= dict2
 ```
 
 
-
-
-
-
-
-1. [1] How to merge two dictionary?
-2. [1] How to remove the prefix and suffix of a string?
 

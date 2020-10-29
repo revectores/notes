@@ -12,7 +12,7 @@ Three problems arised for the web:
 2. How to implement the C/S communication?
 3. How to make computer with different structure hierarchy access the resources on the Web identically?
 
-[URI](), HTTP and [HTML]() are proposed to solve the three problems. This document introduce HTTP, to be more specific, [HTTP/1.1](## HTTP/1.1) for most of the properties, which is the. The evolution of HTTP protocol specification will be introduce in [7. Evolution of HTTP](# 7. Evolution of HTTP), and the performace comparison in [HTTP_performace_evolution]().
+URI, HTTP and [HTML](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/programming/frontend/html/html_intro/html_intro.md) are proposed to solve the three problems. This document introduce HTTP, to be more specific, HTTP/1.1 for most of the properties, which is the. The evolution of HTTP protocol specification will be introduce in [Evolution of HTTP](#evolution-of-http).
 
 
 

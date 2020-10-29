@@ -44,7 +44,7 @@ Physical interpretation of parameters $\lambda ,r$:
 
 
 
-##### # Density Relevant Model: Logistic Equation
+##### # Logistic Equation
 
 $$
 \frac{\dN}{\dt} = rN\left( 1 - \frac{N}{K} \right)

@@ -2,28 +2,28 @@
 
 # Structured Query Language
 
-### 1. Naming Convention
+### 1. SQL Naming Conventions
 
 ##### # Keyword Case
 
-It might be an historial convenience when the editor doesn't support syntax highlighting to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so we'll keep it lowercase, as the modern Homo sapiens.
+It might be an historial convenience to uppercase all the keywords when the editor doesn't support syntax highlighting in order to make the SQL more readable, while it seems to be less readable to make it SHOUT nowadays, so we'll keep the keywords lowercase, since we are already the modern Homo sapiens.
 
 
 
 ##### # Table Name Form
 
-There's a huge divergence between programmers still. We prefer singular. The most important reason is that, although it seems more logic to name a table that stores more than one user as `users`, but as far as we concerned the name should be considered as an abstraction model or set instead of the "objects container". The advantage of this perspective is shown more clear in the query process, where we try to get the property of record:
+There's a huge divergence between programmers still. We prefer singular. The most important reason is that, although it seems more logic to name a table that stores more than one user as `users`, but if we consider the table as an abstraction model or set instead of the "objects container", singular form will be more clear when we access the property of table:
 
 ```sql
 select user.id, user.name from user where user.wealth > 1000;
 select users.id, users.name from users where users.wealth > 1000;
 ```
 
-Comparing the two query above, there's no doubt that it looks more naturally that we access the property of object like `user.name` instead of `users.name`.
+Comparing the two query above, there's no doubt that it looks more natural that we access the property of object like `user.name` instead of `users.name`.
 
-Besides the perspective how we consider about the table, it also reduce the code length, which contributes to the simplity, and provides more readibility since the plural might be complex in some cases.  
+Besides, it also reduce code length, which contributes to simplity, and provides more readibility since the plural might be complex in some cases.
 
-> You can refer the further disscussion in the link [https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names](https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names), which provides detailed examples and reasons.
+> Refer the further disscussion: [https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names](https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vuus-plural-names), which provides detailed examples and reasons.
 >
 > And we strongly recommend the answer [https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vs-plural-names#3894235](https://stackoverflow.com/questions/338156/table-naming-dilemma-singular-vs-plural-names#3894235) which introduce the uninflected idea which is pretty convictive.
 
@@ -31,7 +31,7 @@ Besides the perspective how we consider about the table, it also reduce the code
 
 ##### # under_score or camelCase
 
-There's a huge divergence. For now we use the underscore style in both cases in practice.
+There is also a huge divergence. For now we use the underscore style in both the table name and the field name in practice.
 
 
 
@@ -44,20 +44,20 @@ There's a huge divergence. For now we use the underscore style in both cases in 
 
 ##### # `CREATE TABLE`
 
-To illustrate the syntax details of create a new table, here we exam a example about modeling a person by the table:
+Here is a demo about how to model a person by table in SQL:
 
 ```sql
 create table person (
-	id integer PRIMARY KEY AUTO_INCREMENT,
+	id int primary key auto_increment,
     name text not null,
-	age text not null,
+	age int not null,
     wealth numeric not null default 0;
 );
 ```
 
-Here we create a table named `person` with three columns: `id`, `name`, `birthday`, and `wealth` with **data type** `INTEGER`, `TEXT`, `INTEGER`, and `NUMERIC` respectively.
+Here we create a table named `person` with three columns: `id`, `name`, `birthday`, and `wealth` with [data type](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/database/sql/sql_data_type/sql_data_type.md) `int`, `text`, `int`, and `numeric` respectively.
 
-Specially, `id` is specified as the `PRIMARY KEY` of this table, and it is set to `AUTO_INCREMENT`, by doing this, we're free to control this column manually when inserting new record, but let the database increase `1` for the `id` field each time we insert new record automatically.
+Specially, `id` is specified as the `primary key` of this table, and it is set to be `auto_increment`, by doing this, we're free to control this column manually when inserting new record, but let the database increase `1` for the `id` field each time we insert new record automatically.
 
 Normally, when we insert a new record, if some of the columns are not assigned, it will be set as the default value, if no default value given, it will be set as `NULL`. If one column is declared as `NOT NULL`, when you try to assign it as `NULL`, the database will raise an error. Notice that since the primary key of table must not be null obviously, so there's no necessary to specify `NOT NULL` to `id` field.
 
@@ -190,21 +190,6 @@ from instructor;
 
 
 
-
-
-### 4. Join
-
-
-
-```sql
-select *
-from instructor natural join teaches;
-```
-
-
-
-
-
 ### 5. Group
 
 
@@ -301,8 +286,6 @@ Specially, if all the inputs are `null`, cluster function returns `null` while `
 
 
 
-
-
 ##### # `with`
 
 Find the department with maximum budget:
@@ -316,60 +299,4 @@ from department, max_budget
 where department.budget = max_budget.value 
 ```
 
-
-
-
-
-### SQL Join
-
-Join operation:
-
-- join type
-- join 
-
-
-There are four types of join operations:
-
-- Inner join only keeps the matched tuples.
-- The left outer join also keeps the tuple (even unmatched) on the left table.
-- The right outer join also keeps the tuple (even unmatched) on the right table.
-- The full outer join keeps all the tuples on both table.
-
-Natural join automatically detect the same columns to match, while `on` and `using` can be applied to tell which columns to match manually. The difference is: `using`, same as natural, removes duplicates while `on` keeps them.
-
-
-
-```sql
-select * from course inner join prereq on
-course.course_id = prereq.course_id;
-```
-
-
-
-
-
-### Perspective
-
-
-
-
-
-
-```sql
-select dept_name, count(*) as instructor_count
-from department left outer join instructor
-using department.dept_name = instructor.dept_name
-group by dept_name
-
-
-```
-
-
-We can create view to added abstraction level to real tables:
-
-```sql
-create view view_name[(<column_name1>, <column_name2>, ...)]
-as <query_expression>
-[with check option];
-```
 

@@ -2,7 +2,7 @@
 
 ### 1. Why DNS
 
-As we known, the [IP address](file:///Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/computer_network/network_layer/ip_address/ip_address.md#historial-classification) is a 32-bits binary number, usually represented by dotted-decimal notation. Even so, the notation is still not friendly to human beings. Hence we invent **domain name**, and build a system that maps domain name to IP address, that is, the **domain name system(DNS)**.
+As we known, the [IP address](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/computer_network/network_layer/ip_address/ip_address.md#historial-classification) is a 32-bits binary number, usually represented by dotted-decimal notation. Even so, the notation is still not friendly to human beings. Hence we invent **domain name**, and build a system that maps domain name to IP address, that is, the **domain name system(DNS)**.
 
 When the user tries to access the domain name in application (such as browser or ssh), computer queries the DNS system to map the domain name into its corresponding IP address, prepared for the establishment of TCP connection in next step.
 
@@ -46,7 +46,7 @@ The hierarchy of domain name is not relavent of the physical location and the IP
 There are three types of top level domains:
 
 1. Infrastructure top-level domain (arpa). This is reserved for reverse domain name resolution.==TODO: What's this?==
-2. Country code top-level domains (ccTLD). The ccTLD are the two-letter ISO country codes (with some exceptions). Based on the hierarchy of domain name system, the [second level domain](## Second Level Domain) names are regulated by the country itself.
+2. Country code top-level domains (ccTLD). The ccTLD are the two-letter ISO country codes (with some exceptions). Based on the hierarchy of domain name system, the [second level domain](#second-level-domain) names are regulated by the country itself.
 3. Generic top level domains (gTLD). Such as `com`, `org`.
 
 
@@ -76,7 +76,7 @@ Register second domain name is peritted, like `revector.cn`. Since the DNS has a
 
 ##### # Domain Name Server
 
-The simplest solution of resolution (from domain name to IP address) is to maintain a complete mapping table named `hosts`, this is how [ARPANET]() do, and this file is still kept in modern operating system as the local cache of DNS system. In early decades, GFW applied [DNS pollution]() as one method to block forbidden websites, which can be easily bypassed by change the local file `hosts` into actual mapping.
+The simplest solution of resolution (from domain name to IP address) is to maintain a complete mapping table named `hosts`, this is how [ARPANET](https://en.wikipedia.org/wiki/ARPANET) do, and this file is still kept in modern operating system as the local cache of DNS system. In early decades, GFW applied [DNS pollution](#dns-pollution) as one method to block forbidden websites, which can be easily bypassed by change the local file `hosts` into actual mapping.
 
 However, since there are so many hosts in the entire Internet and the network structure varies day by day, it's not unrealistic to implement DNS as a local file, or use a few fixed servers to response DNS requests. Instead, it is designed as a distributed query system. 
 
@@ -114,7 +114,7 @@ The lookup approach depends on the setting on local DNS server, which usually se
 
 ##### # `dig` Command
 
-[`dig`](), formally named **domain information groper**, is a cli tool to create and track DNS lookup process. Domain name servers, DNS records cache, and many relavent information can be achieved by `dig`.
+[`dig`](https://linux.die.net/man/1/dig), formally named **domain information groper**, is a cli tool to create and track DNS lookup process. Domain name servers, DNS records cache, and many relavent information can be achieved by `dig`.
 
 ```shell
 > dig www.google.com
@@ -186,7 +186,7 @@ Theorectically, the DNS hijacking might taken place in any step during DNS looku
 
 
 
-##### # DNS Cache Pollution
+##### # DNS Pollution
 
 If the DNS caches in DNS servers are modified to wrong IP address (by any means), we say the DNS cache is **polluted** or **poisoned**. There are multiple methods to modifiy the cache, the simplist one is control the server the edit the cache as a text file, or hijack the request from local to global name servers to make the server cache wrong address unwittingly.
 

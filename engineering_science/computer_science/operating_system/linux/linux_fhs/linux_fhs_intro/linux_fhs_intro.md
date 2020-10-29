@@ -1,0 +1,2 @@
+# LInux Filesystem Hierarchy Standard
+

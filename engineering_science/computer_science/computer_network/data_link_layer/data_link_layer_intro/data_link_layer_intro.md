@@ -4,7 +4,7 @@
 
 ##### # Responsibility
 
-As the sender in trasmission, data link layer receive the package from [network layer](network_layer.md) and framming it than pass it into the [physical layer](physical_layer.md). As the receiver in transmission, data link layer receive the physical signals from physical layer and pass it into network layer.
+As the sender in trasmission, data link layer receive the package from [network layer](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/computer_network/network_layer/network_layer_intro/network_layer_intro.md) and framming it than pass it into the [physical layer](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/computer_network/physical_layer/physical_layer.md). As the receiver in transmission, data link layer receive the physical signals froms physical layer and pass it into network layer.
 
 
 
@@ -28,5 +28,5 @@ There are two kinds of channel in data link layer: **point-to-point channel** an
 
 ##### # Transfer Error and Checking Mechanism
 
-The error-checking mechanism used in PPP is usually [CRC](), notice that CRC can only handle the bit-error, hence PPP does not provide the reliable transport. **High-level data link control(HDLC)** is chosen in the decade when errors occur in physical channel frequently.
+The error-checking mechanism used in PPP is usually [Cyclic Redundancy Check](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/computer_network/error_detection/cyclic_redundancy_check/cyclic_redundancy_check.md), notice that CRC can only handle the bit-error, hence PPP does not provide the reliable transport. **High-level data link control(HDLC)** is chosen in the decade when errors occur in physical channel frequently.
 

@@ -1,12 +1,12 @@
 # Unix File
 
-### 1. File Types
+### 1. Unix File Types
 
 ##### # Seven File Types in UNIX
 
 There are 7 types of files in UNIX system. Most of the files are regular file or directory file in UNIX system.
 
-1. **Regular file**.
+1. **Regular file**. 
 
 2. **Directory file**. A directory file is a file contains the names of other files and pointers on these files. Any process that has read permission for a directory file can read the contents, but only the kernel can write directly to a directory file.
 
@@ -16,9 +16,9 @@ There are 7 types of files in UNIX system. Most of the files are regular file or
 
 4. **Character special file**.
 
-5. **FIFO**. FIFO file, or pipe, is a type of file used for [IPC](../unix_ipc/unix_ipc.md).
+5. **FIFO**. FIFO file, or pipe, is a type of file used for [IPC](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/operating_system/unix/unix_ipc/unix_ipc.md).
 
-6. **Socket**. As introduced in [socket.md](socket.md) in computer network, socket is the abstraction for the network communication between processes. A socket can also be used for non-network communication in a single host, in this case it degeneres to one way for the normal IPC.
+6. **Socket**. As introduced in [socket](https://en.wikipedia.org/wiki/Network_socket) in computer network, socket is the abstraction for the network communication between processes. A socket can also be used for non-network communication in a single host, in this case it degeneres to one way for the normal IPC.
 
 7. **Symbolic link**. Symbolic link points to another file.
 
@@ -38,21 +38,21 @@ Correspondingly, seven macros are provided to read the type of a file:
 | `S_ISSOCK()` |         socket         |
 | `S_ISLNK()`  |     symbolic link      |
 
-An example using these macros to determine the type of a file is given in [print_type_of_file.md](print_type_of_file.md). ==TODO: Create this.==
+An example using these macros to determine the type of a file is given in [print_file_type.c](src__print_file_type/print_file_type.c). Use this to find all the types of files in system. Hint: the character and block specical files can be found in [`/dev`](https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/dev.html).
 
 
 
 ##### # File Descriptor
 
-**File descriptor** is a non-negative integer used to referred a file by the system kernel. When we `open/creat` a new file, a file descriptor will be returned, and then we can use it in the `read/write` functions to refer the file.
+**File descriptor** is a non-negative integer used to referred a file by the system kernel. When we [`open`](#open) a new file, a file descriptor will be returned, and then we can use it in the `read/write` functions to refer the file.
 
 Specifically, the file descriptor 0 is used to refer the standard input, 1 for standard output, and 2 for standard error. To improve the readibility, `include #<unistd.h>` to use the symbolic constants instead of the integers.
 
-| File Descriptor | Symbolic Constant |    Reference    |
-| :-------------: | :---------------: | :-------------: |
-|        0        |   STDIN_FILENO    | standard input  |
-|        1        |   STDOUT_FILENO   | standard output |
-|        2        |   STDERR_FILENO   | standard error  |
+| File Descriptor | Symbolic Constant | File Object Constant |    Reference    |
+| :-------------: | :---------------: | :------------------: | :-------------: |
+|        0        |  `STDIN_FILENO`   |       `stdin`        | standard input  |
+|        1        |  `STDOUT_FILENO`  |       `stdout`       | standard output |
+|        2        |  `STDERR_FILENO`  |       `stderr`       | standard error  |
 
 The range of file descriptors in modern Linux and Mac OS X is essentially infinite, bounded by the limit of other resources.
 
@@ -68,9 +68,11 @@ The three files `stdin/stdout/stderr` will be open automatically as a process op
 
 ### 2. File Operation System Call
 
-##### # `open/openat`
+<u>Introduce the common Unix file system calls: `open`, `close`, `read`, `write`, `lseek`. Historical `creat` is also included.</u>
 
-We open/craete a file by the `open/openat` function.
+##### # `open`
+
+We open a file by the `open/openat` function.
 
 ```c
 #include <fcntl.h>
@@ -79,23 +81,23 @@ int open(const char* path, int oflag, ... );
 int openat(int fd, const char* path, int oflag, ... );
 ```
 
-1. `path` parameter specifies the path of file to open/create.
+1. `path` specifies the path of file to open.
 
 2. `oflag` parameter using pre-defined constants to specify the mode we open the file, joining by or `||` operator. The constants are defined at `<fcntl.h>`.
 
-    | Constant |         Meanning          |
-    | :------: | :-----------------------: |
-    | O_RDONLY |         Read only         |
-    | O_WRONLY |        Write only         |
-    |  O_RDWR  |      Read and write       |
-    |  O_EXEC  |       Execute only        |
-    | O_SEARCH | Search only (directories) |
+    |  Constant  |      Interpretation       |
+    | :--------: | :-----------------------: |
+    | `O_RDONLY` |         Read only         |
+    | `O_WRONLY` |        Write only         |
+    |  `O_RDWR`  |      Read and write       |
+    |  `O_EXEC`  |       Execute only        |
+    | `O_SEARCH` | Search only (directories) |
 
-    **One and only one** of the listed constant must be specified. And other constants are optional.
+    **One and only one** of the listed constant must be specified. The complete table of `oflag`, including other optional constants, are listed in [file_oflag](file_oflag.md).
 
 3. The last argument `...` is the ISO C style to specify arguments of uncertain types and numbers. These arguments will be used when a new file is being create.
 
-As mentioned, both of the functions return file descriptor if OK, or -1 will be  The returned file descriptor is guaranteed to be the lowest available number. 
+Both of the functions return the file descriptor if OK, or -1 when failed (for example, permission denied). The returned file descriptor is guaranteed to be the **lowest available number**. Since the three special descriptors are automatically opened by system, the aforementioned rule gurantees the first opened file must be assigned 3 as the file descriptor:
 
 ```c
 int main(int argc, char** argv){
@@ -104,6 +106,8 @@ int main(int argc, char** argv){
     return 0;
 }
 ```
+
+The more interesting (and useful) fact is, if we close one of the special file and open a new file, the new file will take over the position of that closed one.
 
 ```c
 int main(int argc, char** argv){
@@ -114,7 +118,9 @@ int main(int argc, char** argv){
 }
 ```
 
+Believe it or not, try by yourself in [test_opened_file_descriptor.c](src__test_opened_file_descriptor/test_opened_file_descriptor.c).
 
+Think of it. This operation provides a elaborate mechanism to control source/target of input/output, especially when we fork and exec a child process. Next time when the process read something from `STDIN_FILENO`, is it some other file instead of the read standard input.
 
 
 
@@ -136,7 +142,7 @@ int creat(const char* path, mode_t mode);
 open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 ```
 
-> Historically, in early versions of the UNIX System, the second argument to open could be only 0, 1, or 2. There was no way to open a file that didn’t already exist. Therefore, a separate system call, creat, was needed to create new files. With the `O_CREAT` and `O_TRUNC` options now provided by open, a separate creat function is no longer needed.
+> Historically, in early versions of the UNIX System, the second argument to open could be only `O_RDONLY`, `O_WRONLY`, or `O_RDWR`(0, 1, 2). There was no way to open a file that didn’t already exist. Therefore, a separate system call, `creat`, was needed to create new files. With the `O_CREAT` and `O_TRUNC` options now provided by open, a separate creat function is no longer needed.
 >
 > One deficiency with creat is that the file is opened only for writing. Before the new version of open was provided, if we were creating a temporary file that we wanted to write and then read back, we had to call creat, close, and then open. A better way is to use the open function, as in
 >
@@ -163,7 +169,7 @@ int close(int fd);
 
 ##### # `lseek`
 
-During the processing of a file, the current file offset will be automatically handled as the `open/read/write` function called. By default, the offset is initialized to 0, unless the `O_APPEND` option is specified. The `read/write` function will increase the offset based on how many data have been read/write.
+During the processing of a file, the current file offset will be automatically handled as the `read/write` function called. By default, the offset is initialized to 0, or the length of file if the `O_APPEND` option is specified. The `read/write` function will increase the offset based on how many data have been read/write.
 
 We can use `lseek` to set the current offset explicitly:
 
@@ -198,7 +204,7 @@ We use `read` function to read from a opened file:
 ssize_t read(int fd, void* buf, size_t nbytes);
 ```
 
-`read` returns the number of bytes read, 0 if end of file, -1 on error. The performance relative to `buf` 
+`read` returns the number of bytes read, 0 if end of file, -1 on error. The performance is depends on the `buf` and the buffer size in the operating system level.
 
 
 
@@ -220,7 +226,7 @@ ssize_t write(int fd, const void* buf, size_t nbytes);
 
 
 
-### 3. File Information
+### 3. Unix File Information
 
 ##### # `stat` Functions
 
@@ -240,7 +246,7 @@ int fstatat(int fd, const char* restrict pathname,
             struct stat* restrict buf, int flag);
 ```
 
-All the four three functions return 0 if OK, -1 on error. The information is given by filling the `struct stat* buf`, which is defined at [struct_stat](struct_stat.md).
+All the four three functions return 0 if OK, -1 on error. The information is given by filling the `struct stat* buf`. Refer to [struct_stat](struct_stat.md) for the prototype of `struct stat`.
 
 As noticed, the `fstat` use file descriptor `fd` as the parameter instead of the `pathname`. For the symbolic link, `lstat` list the inforamtion about the symbolic link itself instead of the file it points to.
 
@@ -253,7 +259,7 @@ In both case `fstat` works like when we providing the relative path or absolute 
 
 Furthermore, the `flag` parameter specifies whether we use follows the symbolic link, depending on whether the flag `AT_SYMLINK_NOFOLLOW` is set.
 
-`stat` function is used by the [`ls`](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/operating_system/unix/unix_command/cmd_ls/cmd_ls.md) command, who lists all the information about the files.
+`stat` is the basis of implementation of [`ls`](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/engineering_science/computer_science/operating_system/unix/unix_command/cmd_ls/cmd_ls.md) command, who lists all the information about the files.
 
 
 

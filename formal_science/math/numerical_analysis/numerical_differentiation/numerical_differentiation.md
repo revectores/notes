@@ -8,7 +8,7 @@ $$
 
 ### 1. Differentiation Approximation By Difference Quotient
 
-As known, the derivative from right/left/both sides are defined as the limit of  forward/backward/central difference quotients:
+As definition, the derivative from right/left/both sides are defined as the limit of  forward/backward/central difference quotients:
 $$
 \begin{align}
 & f'(x_0) = \lim_{h\rightarrow 0} \frac{f(x_0+h)-f(x_0)}{h} \\
@@ -16,7 +16,7 @@ $$
 & f'(x_0) = \lim_{h\rightarrow 0} \frac{f(x_0+h)-f(x_0-h)}{2h}
 \end{align}
 $$
-respectively, and they are equivalent if the function $f(x)$ is derivative at $x_0$, hence we just use the difference quotients to approximate those derivatives:
+respectively, and they are equivalent if the function $f(x)$ is derivative at $x_0$, hence we can use the difference quotients to approximate those derivatives for particular small $h$:
 $$
 \begin{align}
 & f'(x_0) \approx \frac{f(x_0+h)-f(x_o)}{h} \\
@@ -65,26 +65,46 @@ $$
 
 
 
+
+
+
+
 ### 2. Numerical Differentiation by Interpolation
 
-For the given function values, construct Lagrange intropolation polynomials
+For the given function values, construct [Lagrange intropolation](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/formal_science/math/numerical_analysis/interpolation/interpolation.md#lagrange-interpolation) polynomials
 $$
-f(x) \approx L_n(x) = \sum_{i=0}^n l_i(x)f(x_i) \\
+f(x) \approx L_n(x) = \sum_{i=0}^n l_i(x)f(x_i)
 $$
 The derivative
 $$
 f'(x) \approx L'_n(x) = \sum_{i=0}^n l'_i(x)f(x_i)
 $$
 
-
+The remainder term
 
 $$
 R(x) = \ddx \left( \frac{f^{(n+1)}(\xi)}{(n+1)!}\prod_{i=0}^n(x-x_i) \right)
 $$
 
-$$
-R(x_j) = \prod_{i=0\\i\neq j}^n (x_j-x_i)\frac{f^{(n+1)}(\xi)}{(n+1)!}
-$$
+> **Example**. Given $(x_i, f(x_i)), i=0,1,2$, Denote $x_2-x_1 = x_1-x_0 =h$, compute $f'(x_0), f'(x_1), f'(x_2)$
+>
+> **Solution**. Apply the Lagrange interpolation:
+> $$
+> L_2(x) = \frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)}f(x_0)
+> + \frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)}f(x_1)
+> + \frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)}f(x_2)
+> $$
+>
+> Hence
+> $$
+> \begin{align}
+> f'(x)
+> \approx L_2'(x)
+> &= \frac{f(x_0)}{2h^2}(x-x_1+x-x_2) - \frac{f(x_1)}{h^2}(x-x_0+x-x_2) \\
+> &~~~~+ \frac{f(x_2)}{2h^2}(x-x_0+x-x_1)
+> \end{align}
+> $$
+> Substitute $x=x_i, i=0,1,2$, we have
 
 $$
 \begin{align}
@@ -93,15 +113,5 @@ $$
 & f'(x_2) = \frac{1}{2h}(f(x_0) + -f(x_1) + 3f(x_2)) \\
 \end{align}
 $$
-
-
-
-
-
-
-
-
-
-
 
 

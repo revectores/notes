@@ -6,33 +6,36 @@ $$
 \newcommand{\dt}{\d t}
 $$
 
-##### # Definition
+##### # Metapopulation Definition
 
-**集合种群(metapopulation)**是指局域种群通过某种程度的个体迁移而连接在一起的局域种群. 本质上集合种群就是种群的种群. 这一概念近年来被重视的原因在于人类活动导致的生境斑块化.
+The **metapopulation** consists of a group of spatially separated populations of the same species which interact at some level. Metapopulation is the population of population. The processing of [habitat fragmentation](https://en.wikipedia.org/wiki/Habitat_fragmentation) makes humans attach importance to this concept.
 
-**周转**指的是局域种群的灭绝以及从现存局域种群中扩散处的个体在尚未被占据的生境斑块内建立起新的局域种群的过程. 周转的速率随斑块面积减小和现存局域种群隔离程度的增加而下降. 
-
-我们定义集合种群在某一时刻$t$的大小为生境斑块的总数占已被占据的生境斑块的数量的比例:
+The **metapopulation size** is defined as the numbe of habitat patches that has been occupied and the total number of habitat patches:
 $$
 p(t) = \frac{h(t)}{H}
 $$
- 这里有$0\le p\le 1$, 当$p=0$时集合种群灭绝, $p=1$时所有生境斑块都已经被占领. 
+where $0\le p\le 1$, $p=0$ indicates the extinction of metapopulation, and $p=1$ indicates that all the patches have been occupied.
+
+
+
+##### # Turnover
+
+**Turnover** is the event when a habitat patch becomes unoccupied through extinction and is then recolonized by individuals from other local populations. The speed of turnover decreases if the area of path decreases or the isolation degree increases.
 
 
 
 ##### # Levins Model
 
+Levins Model describe the growth of metapopulation:
 $$
 \frac{\dp}{\dt} = mp(1-p)-ep
 $$
 
-式中$m$表迁移率(新的局域种群的建立速度), $e$表示灭绝率.
+where $m$ is the migration rate, and $e$ is the extinction rate. The balance state is given by $\dfrac{\dp}{\dt} = 0$, that is $p_0 = 1-e/m$. If $p < p_0(m < e)$, the metapopulation will become extinct eventually, if $p>p_0(m>e)$ the metapopulation continues to exist.
 
-令$\dp/\dt = 0$得集合种群处于平衡状态时的集合种群大小$p = 1-e/m$. 因而若$m<e$, 种群将走向灭绝, 若$m>e$, 则种群会继续存在. 
-
-Levins模型实际上可以改写成
-
+The Levins model can be written as the form
 $$
 \frac{\dp}{\dt} = (m-e)p\left( 1 - \frac{p}{1-e/m} \right)
 $$
-事实上该模型等价于[Logistic模型](). $(m-e)$可以理解成种群的瞬时增长率, $(1-e/m)$(平衡时的种群大小)可以理解成K值.
+which indicates that Levins model is equivalent to [Logistic equation](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/nature_science/biology/ecology/population_ecology/population_growth_model/population_growth_model.md#logistic-equation), where the $(m-e)$ can be intepreted as the instant growth rate and $\left(1-\dfrac{e}{m}\right)$ is the $K$-value.
+

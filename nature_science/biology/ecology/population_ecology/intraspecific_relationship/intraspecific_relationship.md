@@ -1,21 +1,21 @@
 # Intraspecific Relationship
 
-> Predators run for their dinner. Prey run for their lives.
->
-> <p align="right">—Old Ecologist's Proverb</p>
-
 Both the intraspecific and interspecific relationship includes
 
-- Competition
-- Predation or Cannibalism
-- Mutualism
-- Parasitism
+- **Competition**
+- **Predation** for interspecific or **Cannibalism** for intraspecific
+- **Mutualism**
+- **Parasitism**
+
+In this document we introduce the intraspecific relationship, see [interspecific relationship](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/nature_science/biology/ecology/community_ecology/interspecific_relation/interspecific_relation.md) for the other one.
+
+
+
+
 
 
 
 ### Intraspecific Competition
-
-
 
 ##### # Law of constant final yield
 
@@ -46,6 +46,8 @@ Both the intraspecific and interspecific relationship includes
 ##### # Local Mate Competition
 
 在许多无脊椎动物中, 同胞姊妹之间存在局域交配竞争, 这时提高产出雌性的比率则是有利的.
+
+
 
 
 

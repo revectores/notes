@@ -5,11 +5,11 @@
 awk is a interpreted programming language that processing text file line-by-line, which usually used in the shell to accomplish simple field-based text processing task. There are two common usages of awk command
 
 ```shell
-awk 'program' file
-awk -f program-file file
+awk 'program' [file]
+awk -f [program-file] [file]
 ```
 
-By providing the option `-f`, we provide the awk script through a file, which avoid some compatibility problems when using the first inline form, the details is provided in [awk_inline_problems.md](awk_inline_problems.md). ==TODO: Create this.==
+By providing the option `-f`, we provide the awk script through a file, which avoid some compatibility problems when using the first inline form, the details is provided in [awk_inline_problems](awk_inline_problems). ==TODO: Create this.==
 
 Another common approach is processing the output of some shell command through piping:
 
