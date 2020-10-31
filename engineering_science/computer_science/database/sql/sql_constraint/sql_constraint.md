@@ -155,11 +155,8 @@ create table person (
 How to insert a tuple in this case?
 
 - Set the spouse into `null` at first, and latter update it until the corresponding spouse record is inserted.
-
 - Defer the integrity condition until the transaction is committed:
-
     - Add `initially deferred` after the constraint declaration.
-
     - Add `set constraints <constraint-list> deferred`.
 
 
