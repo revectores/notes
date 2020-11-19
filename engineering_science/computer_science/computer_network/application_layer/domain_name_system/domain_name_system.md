@@ -84,7 +84,7 @@ The DNS servers are designed a hierarchic system corresponding to the hierarchy 
 
 There are 13 **logical** root domain name servers, denoted as A~M.
 
-<img src="root_domain_name_servers_map.png" alt="root_domain_name_servers_map"/>
+<img src="root_domain_name_servers_map.png" alt="root_domain_name_servers_map" style="zoom:20%;" />
 
 The topology of authoritative name servers is determined by the institution manages that domain. For example, if one company applied for the domain name `abc.com`, to make the Internet know where its domain name and its subdomain names are, the company should equip a DNS server to provide resolution service. All the domains under one authoritative DNS server constructs a **zone**.
 
@@ -108,7 +108,7 @@ If iterative lookup is applied, the local DNS server takes all the responsibilit
 
 The lookup approach depends on the setting on local DNS server, which usually set to be iterative.
 
-<img src="dns_lookup_iterative.png" alt="dns_lookup_iterative" style="zoom:30%;" />
+<img src="dns_lookup_iterative.png" alt="dns_lookup_iterative" style="zoom:25%;" />
 
 
 

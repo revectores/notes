@@ -1,6 +1,8 @@
 # C++ Template
 
-Template is a feature added in C++11.
+Template is introduced in C++11.
+
+
 
 ##### # Function Template
 

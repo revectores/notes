@@ -1,6 +1,14 @@
 # Sublime
 
-### 1. Snippet
+### 1. Shortcuts
+
+Jump to file: Command + P
+
+
+
+
+
+### 5. Snippet
 
 The format of snippet file:
 

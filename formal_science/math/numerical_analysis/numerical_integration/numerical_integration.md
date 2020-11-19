@@ -13,11 +13,11 @@ $$
 
 ##### # Numerical Integration General Form
 
-Recall [Newton-Leibniz theorem](), from which we compute the integral of continuous function from the primitive function:
+Recall [Newton-Leibniz theorem](), based on which we compute the integral of continuous function from the primitive function:
 $$
 \int_a^b f(x)\dx = F(b) - F(a)
 $$
-while it is difficult if the integrand is not primary elementary function, and it is impossible if the function is given by points.
+However this approach could be unrealistic if the integrand is not primary elementary function, and it is even not possbile if the function is given by points.
 
 By definition, the integral is defined as the limit of Riemann sum:
 $$
@@ -31,7 +31,7 @@ $$
 \end{align}
 $$
 
-where $I(f)$ is the precise value of integral, and $I_n(f)$ is the approximate of $I(f)$, $x_i$ is **integral point**, and $\alpha_i$ is **integral coffieient**. The subscript $n$ represents that there are $n+1$ known points. We compute the $I_n(f)$ by finding the $\alpha_i(0\le i\le n)$.
+where $I(f)$ is the precise value of integral, and $I_n(f)$ is the approximation of $I(f)$, $x_i$ is **integral point**, and $\alpha_i$ is **integral coffieient**. The subscript $n$ represents that there are $n+1$ points. We compute the $I_n(f)$ by finding those $\alpha_i(0\le i\le n)$.
 
 
 
@@ -45,7 +45,7 @@ $$
 \end{align}
 $$
 
-then we say the algebraic precision of $I_n(f)$ has $m$-degree algebraic precision.
+then we say $I_n(f)$ has $m$-degree **algebraic precision**.
 
 > **Example**. Validate this numerical intergration formula has 3-degree algebraic precision.
 > $$
@@ -110,14 +110,9 @@ $$
 \end{align}
 $$
 
-Denotes $\alpha_i = \displaystyle \int_a^b l_i(x)\dx$, we have
-$$
-I_n(f)
-= \int_a^b L_n(x)\dx
-= \sum_{i=0}^n \alpha_i f(x_i)
-$$
+which gives the integral coffieients $\alpha_i = \displaystyle \int_a^b l_i(x)\dx$.
 
-The error of integration interpolation is the integral of the interpolation remainder term:
+The error of integration by interpolation is the integral of the remainder term:
 $$
 E_n(f) = \int_a^b R_n(x)\dx = \int_a^b \frac{f^{(n+1)}(\xi(x))}{(n+1)!}\prod_{i=0}^n(x-x_i)\dx
 $$
@@ -154,21 +149,17 @@ For the polynomial with degree less than $n$, $E_n(f) = 0$, hence the integral o
 
 ##### # General Form of Netwon-Cotes Integration
 
-Devide the integration interval $[a, b]$ into $n$ equal intervals. Denote $h=\dfrac{b-a}{n}$. Use the $x_i = a + ih, i=0,1,\ldots, n$ to construct Lagrange polynomial:
+Devide the integration interval $[a, b]$ into $n$ equal intervals, each has length $h=\dfrac{b-a}{n}$. Use each interval edge $x_i = a + ih, i=0,1,\ldots, n$ to construct Lagrange polynomial:
 $$
 \begin{align}
-\int_a^b f(x)\dx
-&\approx \int_a^b L_n(x)\dx \\
-&= \int_a^b \sum_{i=0}^nl_i(x)f(x_i)\dx \\
-&= \sum_{i=0}^n \left(\int_a^b l_i(x)\dx \right) f(x_i) \\
-&= \sum_{i=0}^n \alpha_i f(x_i)
+\int_a^b f(x)\dx \approx \int_a^b L_n(x)\dx  = \sum_{i=0}^n \alpha_i f(x_i)
 \end{align}
 $$
 where
 $$
 \alpha_i = \int_a^b l_i(x)\dx = \int_a^b \prod_{j=0\\j\neq i}^n \frac{x-x_j}{x_i-x_j}\dx
 $$
-Let $x = a + th, x_i = a +ih$, we have
+To compute cofficients, Let $x = a + th, x_i = a +ih$, we have
 $$
 \frac{x-x_j}{x_i-x_j} = \frac{a+th-(a+jh)}{a+ih-(a+jh)}= \frac{t-j}{i-j}
 $$
@@ -177,14 +168,14 @@ $$
 \begin{align}
 \alpha_i
 &= \int_0^n \frac{t(t-1)\cdots(t-i+1)(t-i-1)\cdots(t-n)}{i!(n-i)!(-1)^{n-1}}h\dt \\
-&= \frac{(b-a)}{n}\frac{(-1)^{n-1}}{i!(n-i)!}\int_0^nt(t-1)(t-i+1)(t-i-1)(t-n)\dt
+&= \frac{b-a}{n}\frac{(-1)^{n-1}}{i!(n-i)!}\int_0^nt(t-1)(t-i+1)(t-i-1)(t-n)\dt
 \end{align}
 $$
 Denote
 $$
 c_i^{(n)} = \frac{(-1)^{n-1}}{i!(n-i)!n}\int_0^nt(t-1)(t-i+1)(t-i-1)(t-n)\dt
 $$
-then $\alpha = (b-a)c_i^{(n)}$ only depends on $n$ but the value of $x_i$. The cofficients $c_i^{(n)}$ is called the **Newton-Cotes cofficient**.
+then $\alpha = (b-a)c_i^{(n)}$ only depends on $n$ regardless of $x_i$. The cofficients $c_i^{(n)}$ is called the **Newton-Cotes cofficient**. The Newton-Cotes cofficients with $n=0, 1, \ldots, 6$ are given in the following list.
 
 | $n$  | $c_0^{n}$ | $c_1^{n}$ | $c_2^{n}$ | $c_3^{n}$ | $c_4^{n}$ | $c_5^{n}$ | $c_6^{n}$ |
 | ---- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
@@ -194,6 +185,8 @@ then $\alpha = (b-a)c_i^{(n)}$ only depends on $n$ but the value of $x_i$. The c
 | 4    | 7/90      | 16/45     | 2/15      | 16/45     | 7/90      |           |           |
 | 5    | 19/288    | 25/96     | 25/144    | 25/144    | 25/96     | 19/288    |           |
 | 6    | 41/840    | 9/35      | 9/280     | 34/105    | 9/280     | 9/35      | 41/840    |
+
+Note that we have $c_i^{(n)}> 0$ for $n\le7$, hence the approximation of integral is stable, while $c_i^{(n)}$ can be negative for $n > 8$, the approximate could be unstable.
 
 
 
@@ -208,18 +201,23 @@ $$
 L_1(f) = T(f) = \frac{b-a}{2}(f(a)+f(b))
 $$
 
-The geometric interpretation of trapezoidal rule is using the trapezoid area under $f(a), f(b)$ to approximate the area under curve.
+The geometric interpretation of trapezoidal rule is using the trapezoid area under the edge points of function to approximate the area under curve.
 
-Truncatation error:
+Truncation error of trapezoidal rule:
 $$
-f(x) = L_1(x) + \frac{f''(\xi)}{2!}(x-a)(x-b), a\le\xi\le b
+\begin{align}
+E_1(f)
+&= \int_a^b \frac{f''(\xi)}{2!}(x-a)(x-b) \\
+&= \frac{f''(\xi)}{2!} \int_a^b (x-a)(x-b) \\
+&= -\frac{f''(\xi)}{12}(b-a)^3, \quad a\le\xi\le b
+\end{align}
 $$
 
 
 
-###### # SimpSon's Rule
+###### # Simpson's Rule
 
-Specically, when $n=2$, that is, we use the quadratic interpolation to approximate the integral, we get the **Simpson's rule**:
+Specically, when $n=2$, that is, we use the quadratic interpolation to approximate the integral, by which we get the **Simpson's rule**:
 $$
 \int_a^b f(x)\dx
 \approx \int_a^b L_2(x)\dx
@@ -229,8 +227,12 @@ $$
 L_2(f) = S(f) = \frac{b-a}{6}\left(f(a) + 4f\left(\frac{a+b}{2}\right) + f(b)\right)
 $$
 
-The geometric interpretation of SimpSon's rule is using the quadratic function determined by three points to approximate the area under curve.
+The geometric interpretation of Simpson's rule is using the quadratic function determined by three given points to approximate the area under curve.
 
+Truncation error of Simpson's Rule:
+$$
+E_2(f) = -\frac{(b-a)^5}{2880}f^{(4)}(\eta), \quad a\le\eta\le b
+$$
 
 
 
@@ -241,31 +243,31 @@ The geometric interpretation of SimpSon's rule is using the quadratic function d
 
 ##### # Composite Integration Introduction
 
-The existence of [Runge Phenomenon](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/formal_science/math/numerical_analysis/interpolation/interpolation.md#runge-phenomenon) make it is not possible to gurantee the convergence of Netwon-Cotes formula in higher order, and the compuation of Netwon-Cotes formula with high order is unstable (proof of both predicates are omitted). To avoid the Runge phenomenon, [segmented interpolation](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/formal_science/math/numerical_analysis/interpolation/interpolation.md#segmented-interpolation) shall be applied, and the integation are computed as the sum of integral in each intervals. This approach is called the **composite integration**.
+The existence of [Runge Phenomenon](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/formal_science/math/numerical_analysis/interpolation/interpolation.md#runge-phenomenon) make it is not possible to gurantee the convergence of Netwon-Cotes formula with high order, and the compuation of Netwon-Cotes formula with high order is unstable (proof of both predicates are omitted). To avoid the Runge phenomenon, [segmented interpolation](/Users/rex/Library/Mobile Documents/com~apple~CloudDocs/skill/notes/formal_science/math/numerical_analysis/interpolation/interpolation.md#segmented-interpolation) shall be applied, and the integation in the entire interval are computed as the sum of integrals in each devided intervals. This approach is named the **composite integration**.
 
 
 
 ##### # Composite Trapezoid Integration
 
-Devide the interval $[a, b]$ into equal intervals, $x_i = a + ih, ~ i = 0,1,\ldots, n$, $h = \dfrac{b-a}{n}$. For the interval $[x_i, x_{i+1}]$, we have
+Devide the interval $[a, b]$ into equal intervals, $x_i = a + ih, ~ i = 0,1,\ldots, n$, $h = \dfrac{b-a}{n}$. For one of the small interval $[x_i, x_{i+1}]$, we have
 $$
 \int_{x_i}^{x_{i+1}}f(x)\dx = \frac{h}{2}(f(x_i) + f(x_{i+1})) - f''(\xi_i)\frac{h^3}{12}
 $$
 
-and
+then
 $$
 I(f)
 = \int_a^b f(x)\dx
 = \sum_{i=0}^{n-1}\int_{x_i}^{x_{i+1}} f(x)\dx, \quad x\in[x_{i}, x_{i+1}]
 $$
-Sum up:
+Sum up all the small intervals:
 $$
 \begin{align}
 I(f) &= \sum_{i=0}^{n-1}\left[ \frac{h}{2}(f(x_i)+f(x_{i+1})) - f''(\xi_i)\frac{h^3}{12} \right] \\
 &= h\left[ \frac{1}{2}f(a) + \sum_{i=1}^{n-1}f(x_i) + \frac{1}{2}f(b) \right] - \frac{h^3}{12}\sum_{i=1}^{n-1}f''(\xi_i)
 \end{align}
 $$
-$I(f)$ constructs of the integral term and remainder term, that is $I(f) = T(h) + E_n(f)$ , where
+$I(f) = T(h) + E_n(f)$, contains the integral term and remainder term , where
 $$
 T(h) = T_n(f) = h\left[ \frac{1}{2}f(a) + \sum_{i=1}^{n-1} f(x_i) + \frac{1}{2}f(b) \right]
 $$
@@ -274,25 +276,7 @@ $$
 E_n(f) = -\frac{h^3}{12}\sum_{i=0}^{n-1}f''(\xi_i)
 $$
 
-> **Proof**.
-> $$
-> E_n(f) = I(f) - T_n(f) =
-> $$
-> Denote
-> $$
-> M_2 = \max_{a\le x\le b} |f''(x)|
-> $$
-> then we have
-> $$
-> |E_n(f)| \le \frac{(b-a)^3}{12n^2}(b-a)M_2 = O\left(\frac{1}{n^2}\right)
-> $$
-> If $N_2$ is known, for any error control $\varepsilon > 0$, we have
-> $$
-> |E_n(f)| = < \varepsilon
-> $$
-> 
-
-Shortcut table:
+We can also use a table to compute and memorize coefficients of composite trapezoid integration:
 
 |      | $x_0$ | $x_1$ | $x_2$ | $x_3$ |
 | :--: | :---: | :---: | :---: | :---: |
@@ -314,7 +298,7 @@ $$
 E_n(f) = -\frac{(2h)^5}{2880}f^{(4)}(\xi_i), ~ x_{2i}\le\zeta_i\le x_{2i+2}
 $$
 
-Shortcut table:
+We can also use a table to compute and memorize coefficients of composite Simpson integration:
 
 |       | $x_0$ | $x_1$ | $x_2$ | $x_3$ | $x_4$ | $x_5$ | $x_6$ | $x_7$ | $x_8$ |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -327,67 +311,71 @@ Shortcut table:
 
 
 
-> Example. Compute $\displaystyle \int_0^1 \e^x\dx$ to 5 decimal percision, how many points should be computed?
+> **Example**. Compute $\displaystyle \int_0^1 \e^x\dx$ to 5 decimal percision, how many points should be computed?
 
 
 
-> Compute $\displaystyle \int_0^{1.2}\sin x^2\dx$ based on Newton-Cotes formula, composite trapezoid integration, and composite Simpson integration.
-
-
+> **Example**. Compute $\displaystyle \int_0^{1.2}\sin x^2\dx$ based on Newton-Cotes formula, composite trapezoid integration, and composite Simpson integration.
 
 
 
 ##### # Automatic Precision Control
 
-Compute integral using Romberg algorithm:
+The truncation error decreases as the number of divided intervals grows, to control the precision we must find the interval counts $n$.
+
+In practice, we use $|T_{2n}(f) - T_n(f)|$ to approxiamte the current precision, the series $T_n(f), T_{2n}(f), \ldots$ is computed sequentially until for some $m$ which meets
+$$
+|T_{2m}(f) - T_m(f)| < \varepsilon
+$$
+or
+$$
+\left|\frac{T_{2m}(f) - T_m(f)}{T_{2m}(f)}\right| < \varepsilon
+$$
+and use the $T_{2m}(f)$ as the approximation of $I(f)$.
 
 
 
 ##### # Romberg Integration
 
+The composite Newton-Cotes interpolation with higher order can be computed by those with lower order by adding the error term, for instance, the Simpson integration $S_n(f)$ can be comptued by the combination of trapezoidal $T_n(f), T_{2n}(f)$ by adding the error term.
+
+To illustrate the principle, consider the error of $T_n(f)$ and $T_{2n}(f)$:
 $$
 \begin{align}
 & I(f) - T_n(f) = -\frac{1}{12}f''(\xi)h^2 = ch^2 \\
-& I(f) - T_{2n}(f) = -\frac{1}{12}f''(\xi)\left(\frac{h}{2}\right)^2 = ch^2
+& I(f) - T_{2n}(f) = -\frac{1}{12}f''(\xi)\left(\frac{h}{2}\right)^2 = c\left(\frac{h}{2}\right)^2
 \end{align}
 $$
 
+Notice the differences above are approximately proportionate, we can use the difference between trapezoidal integration with different intervals to approximate the error to the precise value:
+$$
+3(I(f) - T_{2n}(f)) = T_{2n}(f) - T_n(f)
+$$
+If we use the difference $T_{2n}(f) - T_n(f)$ to "correct" $I(f)$:
+$$
+\begin{align}
+I(f) &= T_{2n}(f) + \frac{1}{3}(T_{2n}(f) - T_n(f)) \\
+&= \frac{4}{3}T_{2n} - \frac{1}{3}T_n = S_n
+\end{align}
+$$
+This approach reduce the truncation error from $O(h^2)$ to $O(h^4)$ without extra computation complexity.
 
+Generally, we can use this approach to reduce the truncation by correct with the error terms repeatedly, this is **Romberg method**:
 
+| $R_{1,1}$  |            |           |          |           |
+| :--------: | :--------: | :-------: | :------: | --------- |
+| $R_{2,1}$  | $R_{2,2}$  |           |          |           |
+| $R_{3,1}$  | $R_{3,2}$  | $R_{3,3}$ |          |           |
+|  $\vdots$  |  $\vdots$  | $\vdots$  | $\ddots$ |           |
+| $R_{m, 1}$ | $R_{m, 2}$ | $R_{m,3}$ | $\ldots$ | $R_{m,m}$ |
+
+where
 
 $$
-R_{k,j} = R_{k, j-1} + \frac{R_{k, j-1}-R_{k-1,j-1}}{4^{j-1}-1}, ~~~~ k = 2, 3, \ldots
+\begin{align}
+& R_{k, 1} = T\left(\frac{h}{2^{k-1}}\right) \\
+& R_{k,j} = R_{k, j-1} + \frac{R_{k, j-1}-R_{k-1,j-1}}{4^{j-1}-1}, ~~~~ k \ge 2, j \ge 2 
+\end{align}
 $$
-Compute until the $|R_{k,k}-R_{k-1,k-1}|$ is less than given precision.
-
-
-
-
-
-
-
-### 6. Multiple Integral
-
-Compute double integral $\displaystyle \int_0^1\int_0^2 \sin(x^2+y)\d y\dx$.
-
-
-
-
-
-
-
-### 7. Guass-Legendre Integral
-
-The Newton-Cotes integration require the steps to be equal,
-$$
-\int_{-1}^1 f(x)\dx
-= f\left(-\frac{1}{\sqrt3 }\right) + f\left(\frac{1}{\sqrt3 }\right)
-$$
-
-
-
-
-
-
-
+Compute repeatedly until the $|R_{k,k}-R_{k-1,k-1}|$ meets the required precision.
 

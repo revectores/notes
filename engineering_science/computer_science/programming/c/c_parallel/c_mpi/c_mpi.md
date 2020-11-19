@@ -325,5 +325,103 @@ int MPI_Scatter (
 )
 ```
 
+Correspondingly, the `MPI_Gather` function gather all the components:
+
+```c
+int MPI_Gather(
+	void*			send_buf_p,	/* in */
+	int				send_count,	/* in */
+	MPI_Datatype	send_type,	/* in */
+	void*			recv_buf_p,	/* out */
+    int				recv_count,	/* in */
+    MPI_Datatype	recv_type,	/* in */
+    int				dest_proc,	/* in */
+    MPI_Comm		comm		/* in */
+)
+```
+
+and `MPI_Allgather ` to gather the components to all nodes:
+
+```c
+int MPI_Allgather(
+	void*			send_buf_p,	/* in */
+	int				send_count,	/* in */
+	MPI_Datatype	send_type,	/* in */
+	void*			recv_buf_p,	/* out */
+    int				recv_count,	/* in */
+    MPI_Datatype	recv_type,	/* in */
+    MPI_Comm		comm		/* in */
+)
+```
+
+
+
+
+
+### 5. MPI Derived Datatype
+
+Use `MPI_Type_create_struct` to build a derived datatype that consists of individual elements that have different basic types:
+
+```c
+int MPI_Type_create_struct (
+	int				count,						/* in */
+    int				array_of_blocklengths[],	/* in */
+    MPI_Aint		array_of_displacemetns[],	/* in */
+    MPI_Datatype	array_of_types[],			/* in */
+	MPI_Datatype	new_type_p					/* out */
+);
+```
+
+Before use the datatype we msut first commit it:
+
+```c
+int MPI_Type_commit(
+    MPI_Datatype*	new_mpi_t_p		/* in/out */
+);
+```
+
+```c
+int MPI_Type_free(
+	MPI_Datatype*	old_mpt_t_p		/* in/out */
+);
+```
+
+
+
+Here is a demo to illustrate the workflow:
+
+```c
+MPI_Aint a_addr, b_addr, n_addr;
+
+int array_of_blocklengths[3] = {1, 1, 1};
+int array_of_displacement[3];
+
+MPI_Get_address(&a, &a_addr);
+array_of_displacements[0] = 0;
+MPI_Get_address(&b, &b_addr);
+array_of_displacements[1] = b_addr - a_addr;
+MPI_Get_address(&n, &n_addr);
+array_of_displacements[2] = n_addr - b_addr;
+
+MPI_Datatype input_mpi_t;
+MPI_Type_craete_struct(3, array_of_blocklengths, array_of_displacements, array_of_types, &input_mpi_t);
+
+MPI_Type_commit(input_mpi_t);
+
+// ...
+
+MPI_Type_free(input_mpi_t);
+```
+
+
+
+
+
+
+
+### 6. MPI Performace Evaluation
+
+
+
 
 

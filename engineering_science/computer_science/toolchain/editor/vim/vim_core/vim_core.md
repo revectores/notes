@@ -119,7 +119,7 @@ cabbrev vsf vert sfind
 
 Generally, there're three basic mode in vim: normal mode, insert mode and visual mode, the normal mode is the default, where you can execute commands from this mode; insert mode is where you can edit the text; and visual mode is used to selected a section of text and latter you can operate on them.
 
-Here are how to switch these three mode from one to another: Based on the normal moode, use `i` to switch to the insert mode(without moving the cursor), and use `v` to switch to the visual mode. You can use `Esc` key to exit other mode and return to the normal mode at any time. Besides, there're several commands that switch to the insert mode with some extra behaviours:
+Here are how to switch these three mode from one to another: When you are in the normal mode, use `i` to switch to the insert mode, and use `v` to switch to the visual mode. You can use `Esc` key to exit other modes and return to the normal mode at any time. Besides, there're several commands that switch to the insert mode with some extra behaviours:
 
 1. Use `o` or `O` to a new line in the bottom/top, and switch into insert mode.
 

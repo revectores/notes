@@ -240,9 +240,20 @@ Refer to the [unqiueness of interpolation polynomial](#uniqueness-of-interpolati
 
 ### 4. Hermite Interpolation
 
-==TODO: Complete Section: Hermite Interpolation==
+##### # Hermite Interpolation Introduction
 
-If the interpolation requires not only the the function value itself but also its derivatives (for some points and orders), it's called **Hermite interpolation** or **osculating polynomial interpolation**. 
+If the interpolation requires not only the the function value itself but also its derivatives (for some points and orders), it's called **Hermite interpolation** or **osculating polynomial interpolation**.
+
+For instance, if the function value and first derivative of $x_0, x_1$ are given: $f(x_0)=y_0, f(x_1)=y_1, f'(x_0)=m_0, f'(x_1)=m_1$, by solving the equations
+$$
+\left\{\begin{array}{ll}
+H_3(x_0) = a_0 + a_1x_0 + a_2x_0^2 + a_3x_0^3 = y_0  \\
+H_3(x_1) = a_0 + a_1x_1 + a_2x_1^2 + a_3x_1^3 = y_1  \\
+H'_3(x_0) = a_1 + 2a_2x_0 + 3a_3x_0^2 = m_0 \\
+H'_3(x_1) = a_1 + 2a_2x_1 + 3a_3x_1^2 = m_1 \\
+\end{array}\right.
+$$
+we have
 $$
 \begin{align}
 H_3(x) =& \left( 1 + 2\frac{x-x_0}{x_1-x_0} \right)\left( \frac{x - x_1}{x_0 - x_1} \right)^2 y_0 + \left( 1 + 2\frac{x-x_1}{x_0-x_1} \right)\left( \frac{x - x_0}{x_1 - x_0} \right)^2 y_1
@@ -251,31 +262,75 @@ H_3(x) =& \left( 1 + 2\frac{x-x_0}{x_1-x_0} \right)\left( \frac{x - x_1}{x_0 - x
 \end{align}
 $$
 
+and the remainder term
+$$
+R_3(x) = \frac{f^{(4)}(\xi)}{4!}(x-x_0)^2(x-x_1)^2, \quad \xi\in[x_0, x_1]
+$$
 
 
-For the given $(x_i, f(x_i), f'(x_i)), i = 0, 1, \ldots, n$, define the sequence
+##### # Hermite Interpolation of Difference Quotient Form
+
+For the given $(x_i, f(x_i), f'(x_i)), i = 0, 1, \ldots, n$, define the sequence $z_{2i} = z_{2i+1} = x_i$, $i = 0, 1, \ldots, n$:
 $$
-z_0 = x_0, z_1 = x_0, z_2 = x_1, z_3 = x_1
+z_0 = x_0, z_1 = x_0, z_2 = x_1, z_3 = x_1, \ldots, z_{2n} = x_n, z_{2n+1} = x_n
 $$
+
+Let
+
+$$
+\begin{align}
+\left\{\begin{array}{ll}
+f[z_{2i-1}, z_{2i}] = \dfrac{f(z_{2i}) - f(z_{2i-1})}{z_{2i} - z_{2i-1}},  & i = 1, 2, \ldots, n \\
+f[z_{2i}, z_{2i+1}] = f'(x_i), & i = 0, 1, \ldots, n
+\end{array}\right.
+\end{align}
+$$
+
+We get the Hermite interpolation in the form of difference quotient:
 
 $$
 H_{2n+1}(x) = f[x_0] + \sum_{k=1}^{2n+1}f[z_0, z_1, \ldots, z_k](x-z_0)\cdots(x-z_{k-1})
 $$
 
 > **Example**. Given $f(x_0), f(x_1), f(x_0)$, construct quadratic interpolation polynomial $H(x)$.
-
-| $i$  |   $z_i$   | $f(z_i)$ |      $f[z_{i-1}, z_i]$      |                  $f[z_{i-2}, z_{i-1}, z_i]$                  |
-| :--: | :-------: | :------: | :-------------------------: | :----------------------------------------------------------: |
-|  0   | $z_0=x_0$ | $f(z_0)$ |                             |                                                              |
-|  1   | $z_1=x_0$ | $f(z_1)$ |   $f[z_0, z_1] = f'(x_0)$   |                                                              |
-|  2   | $z_2=x_1$ | $f(z_2)$ | $f[z_1, z_2] = f[x_0, x_1]$ | $f[z_0, z_1, z_2] = \dfrac{f[x_0, x_1] - f'(x_0)}{x_1 - x_0}$ |
-
-$$
-\begin{align}
-& H(x) = f(x_0) + (x-x_0)f'(x_0) + \frac{f[x_0, x_1] - f'(x_0)}{x_1-x_0}(x-x_0)^2 \\
-& R(x) = \frac{f'''(\xi)}{3!}(x-x_0)^2(x-x_1), ~~~~\xi\in[x_0, x_1]
-\end{align}
-$$
+>
+> **Method 1**. Construct the difference quotient table:
+>
+> | $i$  |   $z_i$   | $f(z_i)$ |      $f[z_{i-1}, z_i]$      |                  $f[z_{i-2}, z_{i-1}, z_i]$                  |
+> | :--: | :-------: | :------: | :-------------------------: | :----------------------------------------------------------: |
+> |  0   | $z_0=x_0$ | $f(z_0)$ |                             |                                                              |
+> |  1   | $z_1=x_0$ | $f(z_1)$ |   $f[z_0, z_1] = f'(x_0)$   |                                                              |
+> |  2   | $z_2=x_1$ | $f(z_2)$ | $f[z_1, z_2] = f[x_0, x_1]$ | $f[z_0, z_1, z_2] = \dfrac{f[x_0, x_1] - f'(x_0)}{x_1 - x_0}$ |
+>
+> Hence the quadratic interpolation polynomial
+> $$
+> H(x) = f(x_0) + (x-x_0)f'(x_0) + \frac{f[x_0, x_1] - f'(x_0)}{x_1-x_0}(x-x_0)^2
+> $$
+>
+> and the remainder term
+> $$
+> R(x) = \frac{f'''(\xi)}{3!}(x-x_0)^2(x-x_1), ~~~~\xi\in[x_0, x_1]
+> $$
+> **Method 2**. Let $H(x) = c_0 + c_1(x-x_0) + c_2(x-x_0)^2$, solve the equations
+> $$
+> \left\{\begin{array}{ll}
+> H(x_0) = f(x_0) \\
+> H'(x_0) = f'(x_0) \\
+> H(x_1) = f(x_0) + (x_1-x_0)f'(x_0) + c_2(x_1-x_0)^2 = f(x_1)
+> \end{array}\right.
+> $$
+> We have
+> $$
+> \left\{\begin{array}{ll}
+> c_0 = f(x_0)  \\
+> c_1 = f'(x_0) \\
+> c_2 = \dfrac{f(x_1) - f(x_0) - (x_1-x_0)f'(x_0)}{(x_1-x_0)^2}
+> \end{array}\right.
+> $$
+> Hence
+> $$
+> H(x) = f(x_0) + (x-x_0)f'(x_0) + \frac{f(x_1)-f(x_0)-(x_1-x_0)f'(x_0)}{(x_1-x_0)^2}(x-x_0)^2
+> $$
 
 
 
@@ -541,6 +596,4 @@ $$
 ### 7. Bézier Curves
 
 ==TODO: Complete Topic: Bézier Curves==
-
-
 
