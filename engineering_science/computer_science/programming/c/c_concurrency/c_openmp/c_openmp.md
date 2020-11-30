@@ -106,7 +106,7 @@ where the pointer `global_result_p` points to the global sum which might be modi
 
 ##### # OpenMP Variable Scope
 
-There are two types of variable: **shared variable** that can be accessed by all the threads and, **private variable** can only be
+There are two types of variable: **shared variable** that can be accessed by all the threads and, **private variable** can only be accessed by the current thread.
 
 All the variables defined before the parallel block are shared by default, while the variables defined in the block is private.
 
@@ -164,25 +164,52 @@ approx = h * approx;
 
 
 
+Only a limit form of `for` are supported:
+
 - The `index` must be a integer or pointer type. (for example, it can't be a float.)
 - The expressions `start`, `end` and `incr` must have a compatible type.
 - The expressions `start`, `end` and `incr` must not change during execution of the loop.
 - During execution of the loop, the variable can only be modified by the increment expression inside the `for` statement.
 
-
+OpenMP is not aware of the dependency between iteration. The programmer should avoid introducing the **loop-carried dependency** in `parallel for `.
 
 ```c
 int Linear_search(int key, int A[], int n){
     int i;
-#	paraga omp parallel 
+#	paraga omp parallel
 }
 ```
 
-OpenMP is not aware of the dependency between iteration.
 
 
 
 
+
+
+
+
+
+
+### OpenMP 
+
+OpenMP provides `atomic` To set a single assignment as critical section:
+
+```c
+#	pragma omp atomic
+	x += y++;
+```
+
+
+
+
+
+
+
+
+
+### OpenMP Performace Test
+
+To time the omp program, use `double omp_get_time(void)`.
 
 
 

@@ -99,7 +99,7 @@ Since Redis is a database, where the data can be modified frequently, the design
 
 ```{.c .numberLines startFrom="123" filename="redis-3.0.0/src/sds.c"}
 /* Enlarge the free space at the end of the sds string so that the caller
- * is sure that after calling this function can overwrite up to addlen
+ * is sure that after calling thi function can overwrite up to addlen
  * bytes after the end of the string, plus one more byte for nul term.
  *
  * Note: this does not change the *length* of the sds string as returned
@@ -219,12 +219,4 @@ static inline size_t sdslen(const sds s) {
     return 0;
 }
 ```
-
-
-
-
-
-
-
-
 

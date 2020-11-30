@@ -1,73 +1,71 @@
 # Document Object Model
 
-##### # Concept
+##### # DOM Definition
 
-<img src="dom_tree.png" alt="dom_tree" style="zoom: 25%; float:right" />DOM被构造为对象的树, HTML中的每一个元素都作为树的一个结点, 除此之外, 每一个元素的内容也作为相应元素的子节点. 当网页被加载时, 浏览器创建文档的DOM, 该模型提供了一系列接口, 便于不同的编程语言对其中的结点元素进行某种操作. 
+A HTML document is a tree of elements and text contents, and **Document Object Model(DOM)** represents each element as an object hence make the document an object tree, which provides a clear interface for modern programming langauge to process (most of the time, it's [JavaScript]()). When the HTML file is loaded, the corresponding DOM is constructed by browser.
 
+<img src="dom_tree.png" alt="root_domain_name_servers_map" style="zoom:25%;" />
 
-
-##### # Node Modification
-
-应用JS可以相应界面事件并且对HTML中的元素内容、属性和样式进行更改. 为了准确进行修改操作, 我们需要确定: 要操作哪个元素对象, 操作元素的什么性质, 执行什么操作行为.
-
-要确定对哪个元素进行操作, 需要获取结点元素对象, 方式包括
-
-1. 通过`getElements?By`系列语句进行获取. 
-    - `getElementById`
-    - `getElementsByClassName`
-    - `getElementsByTagName`
-    - `getElementsByName`
-
-其中第一条ById语句直接返回拥有该id的元素对象(因为id的唯一性), 其他几条语句都返回对象数组, 即使匹配对象只有一条也返回单元数组. 
-
-2. 通过`this`获取: 当`this`被写在起始标签之内时, 等效于该标签所标记的元素对象, 例如
-
-    ```html
-    <h1 onclick="this.innerHTML = 'Thank you!'">
-
-    <h1 onclick="hackMe(this)">Click to Hack!</h1>
-    <script>
-        funciton hackMe(id) {
-        id.innerHTML = "HACK!!!";
-        }
-    </script>
-    ```
-    
-
-由于DOM将节点视为对象, 我们可以使用对JavaScript对象的操作方法访问并修改元素内容、属性、样式, 以及绑定的事件. 访问和修改属性的一般语法为`[node].[attribute]`, 特别地, `style`属性会被自动创建为对象, 因而我们可以通过`[node].style.[property]`访问具体的样式. 访问修改元素事件所绑定的动作`[node].[event_name]`. 该方法的本质是通过元素属性绑定动作的一种变体. JavaScript中一般不采取这个方法来绑定元素事件, 而是直接为元素添加事件监听, 具体方法见[html_event]().
+The root of the entire DOM, which contains all elements of that HTML file, is `document` object.
 
 
 
-##### # Node Creation and Deletion
+##### # DOM Node Modification
 
-我们可以通过`document`对象的`createElement`方法和`createTextNode`方法创建空节点元素以及文本内容. 使用结点的`appendChild`方法可以在该结点元素下添加子结点[^1].
+To make modification to a HTML document, we must specify (1) which element and (2) what property to change and (3) to what value.
 
-`createElement`的`tag`参数指定了该结点的元素类型, 如p, h1等等(注意必须用引号括起). 注意到创建后的元素是没有内容的. 因而需要创建文本节点后应用`appendChild`方法导入. 整个创建过程的实例如下
+We use the `getelements?By` methods of node object to get the node objects with specical properties:
 
+- `getElementById`
+- `getElementsByClassName`
+- `getElementsByTagName`
+- `getElementsByName`
+
+Since the ID of element is unique for the entire HTML document, `getElementById` returns the object with given ID directly, while the other three methods returns the object array.
+
+You can invoke these methods to any node object, and to search the entire file, simply revoke those methods of `document` object.
+
+Specically, when write JavaScript code inside label, we can use `this` to point to the current object. For instance
 
 ```html
-<div id="div1">
-<p id="p1">a para</p>
-<p id="p2">another para</p>
-</div>
+<p onclick="this.innerHTML = 'Thank you!'"></p>
+```
+
+This change the content of current `<p>` when it is clicked.
+
+For operation with more complexity, we can pass `this` object as a parameter into a function:
+
+```html
+<p onclick="hackMe(this)">Click to Hack!</p>
 <script>
-var parent1=document.getElementById("div1")
-var child=document.createElement("p")
-var txt=document.createTextNode("new para")
-child.appendChild(txt)
-parent1.appendChild(child)
+funciton hackMe(id) {
+	id.innerHTML = "HACK!!!";
+}
 </script>
 ```
 
-元素的删除通过父元素的`removeChild`方法进行. 而子节点可以通过`parentNode`方法获取其父节点, 因而实际上我们也可以直接通过子节点删除自身: `node.parentNode.removeChild(node)`.
+Since node is object, we can change the property of element by changing the JavaScript object. Formally, we access the property by `[node].[property_name]`, and change the property by `[node].[property_name] = [property_value]`. Specically, the `style` property will be automatically created as an object, by which we use `[node].style.[property_name]` to access and modify the style property.
+
+The binding event can also be considered as a property, to access or bind some event to node, we simply use `[node].[event_name]`. Though straightforward, this approach is not common in JavaScript but adding the **event binding**. Refer to [html_event]() for the details.
 
 
 
+##### # DOM Node Creation and Deletion
+
+We can invoke the `createElement(tag)` and `createTextNode` method of `document` object to create element with empty content and the text content. Invoke the `appendChild` method of node to add child to it. For instance,
 
 
+```html
+<div id="div1"><p>first paragraph</p></div>
+<script>
+var div = document.getElementById("div1");
+var p   = document.createElement("p");
+var content = document.createTextNode("second paragraph");
+p.appendChild(content);
+div.appendChild(p);
+</script>
+```
 
+`removeChild` method is provided to remove its child. Hence if we want to delete node itself, we must first get the parent node using `parentNode` method: `node.parentNode.removeChild(node)`.
 
-
-
-[^1]: 注意添加的子节点应当是合法的, 例如不允许在内联元素中添加块元素作为子节点).
 
