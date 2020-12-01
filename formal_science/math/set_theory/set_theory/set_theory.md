@@ -8,6 +8,8 @@ $$
 
 ##### # Definition and Expressions
 
+
+
 ##### # Relation between set and element
 
 A 
@@ -32,45 +34,46 @@ A set is a **Family of Sets** if its elements are all sets.
 
 ###### - Unary Operator
 
-**Power Set** $\mathcal{P} (A)$, or notes as $2^A$, represents all subsets of set $A$. The element number $|\mathcal P(A)| = 2^{|A|}$
+**Power Set** $\mathcal{P} (A)$ or $2^A$, represents all subsets of set $A$. The element number $|\mathcal P(A)| = 2^{|A|}$
 
-An interesting example: $\mathcal P(\varnothing) = {\{\varnothing\}}$. $\mathcal P(\{\varnothing\})$
+An interesting example: $\mathcal P(\varnothing) = {\{\varnothing\}}$. $\mathcal P(\{\varnothing\}) = \{ \varnothing, \{ \varnothing \} \}$.
 
-An recursion algorithm for calculating the power set: let $B = A -\{a\}$, then $\mathcal P(A) = \mathcal P(B) \cup \{X\cup \{a\}| X \in \mathcal P(B)\}$. The implements store in `dm/set.py/power_set()`, `dm/set.m/power_set()`.
+An recursion algorithm for calculating the power set: let $B = A -\{a\}$, then $\mathcal P(A) = \mathcal P(B) \cup \{X\cup \{a\}| X \in \mathcal P(B)\}$. The implementation are provided in `dm/set.py/power_set()`, `dm/set.m/power_set()`.
 
 ```python
 def power_set(A):
-    if not A: return {frozenset()}
+    if not A:
+        return set(frozenset())
     a = A.pop()
-    B = power(A)
+    B = power_set(A)
     return B.union([b.union([a]) for b in B])
 
-print(power({1,2,3}))
+print(power_set({1,2,3}))
 ```
 
 ###### - Inifinte Operator
 
 **Generalized union/intersection** The union/intersection of all elements of elements of set $A$.
 
-Empty Set Special Case: $\bigcup \varnothing = \varnothing$,  $\bigcap \varnothing = U$.
+Special case for empty set: $\bigcup \varnothing = \varnothing$,  $\bigcap \varnothing = U$.
 
-Prov. According to the definition, $\bigcap \varnothing = \{x \in U |X\in \varnothing, x \in X\}$, since there is no element in $\varnothing$, the condition is always true, as the result,  $\bigcap \varnothing = U$.
+> **Proof**. Refer to the definition of generalized union, $\bigcap \varnothing = \{x \in U |X\in \varnothing, x \in X\}$, since there is no element in $\varnothing$, the condition is always true, as the result,  $\bigcap \varnothing = U$.
 
 Ex. $A_n = \Big\{ x| 0 < x < 1 + \cfrac{1}{n}, n\in\mathbb N \Big\}$, $\bigcap\limits_{n\in\mathbb N} A_n = (0, 1]$. This shows how we achieve the closed interval(set) through open interval(set):
 
-> Closed Set are closed under infinitely many unions and insections.
+Closed Set are closed under infinitely many unions and insections.
 
 
 
-##### # The Attribute of Set Calculation
+##### # Set Computation Properties
 
 [Computer Auto Set Formula Proving] Assume all the sets in the formula are $A_1, A_2, ... A_n$, list $2^n$ possible combination of element-set belong relations, check them all about weather the two sides of formula are equal.
 
 
 
-##### # Contradiction of Set Theory: **Russell Paradox**
+##### # Contradiction of Set Theory: Russell Paradox
 
-Russell Paradox generated from the free of elements, a wide range of objects, whatever descriable, can be considered as the element of set.
+Russell Paradox generated from the arbitrary of defining elements: any predicates with valid form can be used to construct a set, which leads to the construction like
 
 
 

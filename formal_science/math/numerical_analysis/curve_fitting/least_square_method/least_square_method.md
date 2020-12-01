@@ -22,7 +22,7 @@ R_1 = \sum_{i=1}^m |\varphi(x_i) - y_i|
 $$
 If we use infinite-norm, the indicator is
 $$
-R_{\infin} =  \max_{1\le i\le m}|\varphi(x_i) - y_i|
+R_{\infty} =  \max_{1\le i\le m}|\varphi(x_i) - y_i|
 $$
 If we use 2-norm, the indicator is
 $$

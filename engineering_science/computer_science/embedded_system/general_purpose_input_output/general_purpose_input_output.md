@@ -4,3 +4,5 @@
 
 Note that the input and output register shared the same virtual address, but they are mapped to two different physical addresses.
 
+Refer to [MSP432_GPIO]() for the practical details of GPIO in [MSP432]().
+

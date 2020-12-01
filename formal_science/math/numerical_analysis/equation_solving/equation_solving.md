@@ -16,7 +16,7 @@ Recall the intermediate value theorem, the continuous function $f(x)$ in $[a, b]
 
 Transform $f(x)$ by the form $x=\varphi(x)$. Construct the iteration sequences $x_{k+1} = \varphi(x_k), k=1,2,\cdots$ based on $x_0$, if the iteration converges, that is,
 $$
-\lim_{k\to \infin} x_{k+1} = \lim_{k\to\infty} \varphi(x_k) = \alpha
+\lim_{k\to \infty} x_{k+1} = \lim_{k\to\infty} \varphi(x_k) = \alpha
 $$
 we have $\alpha = \varphi(\alpha)$, then $\alpha$ is the root of $f(x)$. When $|x_{k+1}-x_k|$ less than the given precision, we recognize $x_{k+1}$ as the root of function $f(x)$.
 
@@ -97,7 +97,7 @@ $$
 
 If the iteration form $x_{k+1} = \varphi(x_k)$ converges, $\alpha$ is the root, if
 $$
-\lim_{k\rightarrow\infin}\frac{|x_{k+1}-\alpha|}{|x_k - \alpha|^n} = M
+\lim_{k\rightarrow\infty}\frac{|x_{k+1}-\alpha|}{|x_k - \alpha|^n} = M
 $$
 then we define the order of the interation method as $n$.
 
