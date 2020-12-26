@@ -1,0 +1,39 @@
+\documentclass[varwidth]{standalone}
+%\documentclass[article]
+%\usepackage{xcolor}
+\usepackage{amsmath}
+%\usepackage{algorithm2e}
+\usepackage[noend]{algpseudocode}
+
+%\makeatletter
+%\def\BState{\State\hskip-\ALG@thistlm}
+%\makeatother
+
+\begin{document}
+%\nopagecolor
+%\begin{algorithm}
+%\caption{Crout_decomposition}
+\begin{algorithmic}[1]
+\Function{Crout\_decomposition}{$n$, $A$, $y$}
+\For{$k \gets 1$ to $n$}
+    \For{$i \gets k$ to $n$}
+        \State $l_{ik} \gets a_{ik} - \displaystyle\sum_{r=1}^{k-1}l_{ir}u_{rk}$
+    \EndFor
+    \For{$j \gets k+1$ to $n$}
+        \State $u_{kj} \gets \displaystyle\frac{1}{l_{kk}}\left( a_{kj} - \sum_{r=1}^{k-1}l_{kr}u_{rj} \right)$
+    \EndFor
+\EndFor
+
+\For{$i \gets 1$ to $n$}
+    \State $y_i \gets \displaystyle \frac{1}{l_{ii}}\left(b_i - \sum_{j=1}^{i-1}l_{ij}y_j\right)$
+\EndFor
+
+\For{$i \gets n$ to $1$}
+    \State $x_i \gets \displaystyle y_i - \sum_{j=i+1}^n u_{ij}x_j$
+\EndFor
+\State \Return $x_i, i = 1, 2, \ldots, n$
+
+\EndFunction
+\end{algorithmic}
+%\end{algorithm}
+\end{document}
