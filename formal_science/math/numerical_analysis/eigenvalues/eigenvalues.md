@@ -1,4 +1,4 @@
-# Eigenvalues and Eigenvectors
+# Eigenvalues
 
 $$
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
