@@ -346,7 +346,7 @@ The value of high order polynomial is unstable, the shape polynomial might oscil
 
 > **Example**. Interpolate $f(x) = \dfrac{1}{1+12x^2}$ at evenly spaced poitns in $[-3, 3]$:
 >
-> <img src="Runge_phenomenon.png" alt="Screen Shot 2020-10-29 at 10.57.31" style="zoom:25%;" />
+> <img src="__img__/Runge_phenomenon.png" alt="Screen Shot 2020-10-29 at 10.57.31" style="zoom:25%;" />
 
 
 
