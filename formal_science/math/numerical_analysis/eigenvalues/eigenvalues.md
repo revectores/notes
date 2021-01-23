@@ -16,9 +16,9 @@ $$
 
 ### 1. Introduction
 
-Recall that for matix $A$, if $A\bv = \lambda \bv$, we define $\lambda$ is the **eigenvalue** and $\bv$ is the corresponding **eigenvector** of $A$.
+Recall that for matix $A$, if $A\bv = \lambda \bv$, we define $\lambda$ as the **eigenvalue** and $\bv$ as the corresponding **eigenvector** of $A$.
 
-To compute the eigenvalues and eigenvectors by definition, we need to solve equation $|\lambda I - A| = 0$ with order $n$, where $n$ is the order of matrix. For instance, to compute the eigenvalue of $A = \begin{bmatrix}
+To compute the eigenvalues and eigenvectors by definition, we need to solve equation $|\lambda I - A| = 0$. The order of this equation is at most the order of matrix. For instance, to compute the eigenvalue of $A = \begin{bmatrix}
 0 & 1 \\
 1 & 1
 \end{bmatrix}$, we must solve the euqation
@@ -32,9 +32,9 @@ However, [Abel–Ruffini theorem](https://en.wikipedia.org/wiki/Abel%E2%80%93Ruf
 
 The **dominant eigenvalue**, or **largest magnitude eigenvalue** of $A$ is an eigenvalue $\lambda$ whose magnitude is greater than all other eigenvalues. If it exists, an eigenvector associated to $\lambda$ is called a **dominant eigenvector**.
 
-The dominant eigenvalues is much more significant than others in many practical problems. For instance, whether the iteration matrix convergence when  solving linear equations by applying iteration method depends on the spectral radius (a.k.a. dominant eigenvalue) of matix.
+The dominant eigenvalues is much more significant than others in many practical problems. For instance, whether the iteration matrix converges when solving linear equations depends on the spectral radius (a.k.a. dominant eigenvalue) of matix.
 
-**Power method** is one of the numerical technique to compute dominant eigenvalue, and based on which we developed inverse power method to compute smallest magnitude eigenvalue.
+**Power method** is one of the numerical technique to compute dominant eigenvalue, and based on which we developed **inverse power method** to compute smallest magnitude eigenvalue.
 
 
 
@@ -62,13 +62,13 @@ X^{(1)}
 \end{align}
 $$
 
-Applying mathematical induction, we have
+Applying mathematical induction , we have
 $$
 X^{(k)}
 = AX^{(k-1)}
 = \lambda_1^k\alpha_1 \bv_1 + \lambda_2^k\alpha_2 \bv_2 + \cdots + \lambda_n^k\alpha_n \bv_n
 $$
-This expression indicates that how $X^{(k)}$ change when iterating depends on the distribution of eigenvalues. We'll discuss two simple cases when applying the iteration.
+This expression indicates that how $X^{(k)}$ change when iterating depends on the distribution of eigenvalues. We'll discuss two simple cases.
 
 
 
@@ -129,13 +129,13 @@ $$
 > \end{align}
 > $$
 
-Those trends that do not fit the two cases above require other methods.
+Those trends that do not fit the two cases above require other special processings.
 
 
 
-##### # Normalized Computation of Power Method
+##### # Normalized Power Method
 
-If the dominant eigenvalue is larger or smaller than $1$, some components of $X^{(k)}$ will increase or decrease continuously when iterating, which leads to the precision problem due to [IEEE754](). Hence we apply normalization after each step:
+If the dominant eigenvalue is larger or smaller than $1$, some components of $X^{(k)}$ will increase or decrease continuously when iterating, which leads to the precision problem due to [IEEE754](). Hence we can normalize the vector after each step:
 $$
 Y_0 = \frac{X^{(0)}}{\infnorm{X^{(0)}}} \\
 \left\{\begin{array}{ll}
@@ -143,11 +143,11 @@ X^{(k+1)} = AY^{(k)} \\
 Y^{(k+1)} = \dfrac{X^{(k+1)}}{\infnorm{X^{(k+1)}}}
 \end{array}\right.
 $$
-The normalization process gurantees $\norm{Y^{(k)}}_\infty = 1$, that is, the component that represents dominant eigenvalue of $A$ will remain $\pm1$.
+The normalization process gurantees $\norm{Y^{(k)}}_\infty = 1$, that is, the component that represents dominant eigenvalue of $A$ remains $\pm1$.
 
 There are three cases for normalized power method:
 
-(1) If $\{X^{k}\}$ converges, then there is unique **positive** dominant eigenvalues of $A$
+(1) If $\{X^{k}\}$ converges, there is unique **positive** dominant eigenvalue
 $$
 \left\{\begin{array}{ll}
 \displaystyle \lambda_1 \approx \max_{1\le i \le n} |x_i^{(k)}| = |x_j^{(k)}| \\
@@ -155,14 +155,14 @@ $$
 \end{array}\right.
 $$
 
-(2) If $\{X^{(2k)}\}, \{X^{(2k+1)}\}$ converges to vectors with different signs, there is unique **negative** dominant eigenvalues of $A$
+(2) If $\{X^{(2k)}\}, \{X^{(2k+1)}\}$ converges to two opposite vectors, there is unique **negative** dominant eigenvalue
 $$
 \left\{\begin{array}{ll}
 \displaystyle \lambda_1 \approx - \max_{1\le i \le n} |x_i^{(k)}| = - |x_j^{(k)}| \\
 \bv_1 \approx Y^{(k)}
 \end{array}\right.
 $$
-(3) If ${\{X^{(2k)}\}, \{X^{(2k+1)}\}}$ converges to two different vectors, there are two different dominant eigenvectors with inversed sign. For sufficiently large $k$, we exectue one more **unnormalized** operation $X^{(k+1)} = AX^{(k)} = A^2Y^{(k-1)}$, then
+(3) If ${\{X^{(2k)}\}, \{X^{(2k+1)}\}}$ converges to two different vectors, there are two different dominant eigenvectors with opposite sign. For sufficiently large $k$, we exectue one more **unnormalized** operation $X^{(k+1)} = AX^{(k)} = A^2Y^{(k-1)}$, then
 $$
 \left\{\begin{array}{ll}
 \lambda_1 \approx \displaystyle\sqrt{\frac{x_i^{(k+1)}}{y_i^{(k-1)}}} \\
@@ -172,6 +172,10 @@ $$
 \end{array}\right.
 $$
 (4) It requires special pocessing if $\{ X^{(k)} \}$ does not fit any cases mentioned above.
+
+
+
+
 
 
 
@@ -187,9 +191,9 @@ we multiple $A^{-1}$ on both sides:
 $$
 A^{-1}\bv = \lambda^{-1}\bv
 $$
-That is, the largest magnitude eigenvalue of $A^{-1}$ is exactly the inverse of smallest magnitude eigenvalue of $A$.
+That is, the smallest magnitude eigenvalue of $A$ is exactly the reciprocal of dominant eigenvalue of $A^{-1}$.
 
-In practice, we do not compute $A^{-1}$ then iterating but keep solving equation
+In practice, we do apply power method after computing $A^{-1}$ but keep solving equation
 $$
 AX^{(k+1)} = X^{(k)}
 $$
