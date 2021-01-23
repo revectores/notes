@@ -6,8 +6,11 @@ $$
 \newcommand{\bx}{\b{x}}
 \newcommand{\by}{\b{y}}
 \newcommand{\bb}{\b{b}}
+\newcommand{\bf}{\b{f}}
 \newcommand{\bg}{\b{g}}
 \newcommand{\w}{\widetilde}
+\newcommand{\wL}{\w L}
+\newcommand{\wU}{\w U}
 \newcommand{\pp}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\o}{\overline}
 $$
@@ -328,32 +331,37 @@ We call the matrix with large $\kappa_A$ ill-conditioned, which states "the smal
 
 ### 3. Linear Equation Solving by Iteration
 
-Transform the equations $AX = \by$ into $X = MX + \bg$, for any $X^{(0)}\in R^n$, if the iteration series $\{X^{(k)}\}$ converges, the limit of iteration series $X^*$ is the solution of equations $AX=\by$. 
-
-
-
-If $X^*$ is the solution of equations $AX=\by$, then
+Transform the equations $AX = \by$ into $X = MX + \bg$, for any $X^{(0)}\in R^n$, construct the iteration
 $$
-X^* = MX^* + g
+X^{(k+1)} = MX^{(k)} + \bg
 $$
+if the iteration series $\{X^{(k)}\}$ converges, the limit of iteration series $X^*$ is the solution of equations $AX=\by$. 
 
-$$
-\begin{align}
-X^* - X^{(k+1)}
-&= M(X^*-X^{k}) \\
-&= M^2(X^*-X^{k-1}) \\
-&= \cdots \\
-&= M^{k+1}(X^*-X^{(0)})
-\end{align}
-$$
+In practice, the iteration is terminated once we have $\norm{X^{(k+1)} - X^{(k)}}_p < \varepsilon$, and pick $X^{(k+1)}$ as the approximation of solution.
 
-$\displaystyle \lim_{k\rightarrow \infty} M^{k} = 0$ if and only if $\rho(M) < 1$. Hence we define the matrix with spectral radius less than 1 **convergent matrix**.
+The convergence of iteration is determined by spectral radius of iteration matrix $M$. Specifically, the iteration converges if and only if the spectral radius $\rho(M) < 1$.
 
-That is, whether the linear equations converges depends on the property of iteration matrix, regardless of the solution $\alpha$ and $X^{(0)}$.
+> **Proof**. If $X^*$ is the solution of equation $AX=\by$, then
+> $$
+> X^* = MX^* + \bg
+> $$
+>
+> $$
+> \begin{align}
+> X^* - X^{(k+1)}
+> &= M(X^*-X^{k}) \\
+> &= M^2(X^*-X^{k-1}) \\
+> &= \cdots \\
+> &= M^{k+1}(X^*-X^{(0)})
+> \end{align}
+> $$
+>
+> $\displaystyle \lim_{k\rightarrow \infty} M^{k} = 0$ if and only if $\rho(M) < 1$. Hence we define the matrix with spectral radius less than 1 **convergent matrix**.
+>
+> That is, whether the linear equations converges depends on the property of iteration matrix, regardless of the solution $\alpha$ and $X^{(0)}$.
+>
 
-By definition, to compute the spectral radius of matrix, we have to compute the 
-
-
+By definition, we have to compute all the eigenvalues to get the spectral radius of matrix. We may simplify this work by computing the norm $\norm A_p$. Note that $\norm A_p \ge \rho(A)$, if $\norm A_p < 1$, the iteration matrix must be convergent.
 
 
 
@@ -378,8 +386,6 @@ x_n = \dfrac{1}{a_{nn}}\left({-a_{n1}x_2 - \cdots - a_{nn}x_n + y_n}\right)  \\
 \end{array}\right.
 $$
 
-
-
 The iteration form
 $$
 \left\{\begin{array}{ll}
@@ -389,38 +395,21 @@ x_2^{(k+1)} = \dfrac{1}{a_{22}}\left({-a_{21}x_2^{(k)} - \cdots - a_{2n}x_n^{(k)
 x_n^{(k+1)} = \dfrac{1}{a_{nn}}\left({-a_{n1}x_1^{k} - \cdots - a_{n, n-1}x_n^{(k)} + y_n}\right)  \\
 \end{array}\right.
 $$
-Denote $b_{ij} = - a_{ij}/a_{ii}, g_{i} = y_i/a_{ii}$, the matrix form of Jacobi iteration is
+The matrix form of Jacobi iteration is
+$$
+X^{(k+1)} = BX^{k} + \bg
 $$
 
-$$
+where $B = I - D^{-1}A,~\bg = D^{-1}y$.
 
+There is a shortcut to determine the convergence of iteration matrix: if the coefficient matrix $A$ meets one of following condition:
 
-
-
-> Solve equations with Jacobi iteration:
-> $$
-> \left\{\begin{array}{ll}
-> 2x_1 - x_2 - x_3 = -5 \\
-> x_1 + 5x_2 - x_3 = 8 \\
-> x_1 + x_2 + 10x_3 = 11
-> \end{array}\right.
-> $$
-> 
->
-> 
-
-
-
-If the matrix $A$ meets one of the condition:
-
-- $|a_{ii}| > \displaystyle \sum_{j=1\\j\neq i}^n |a_ij|,\quad i=1, 2, \ldots, n$.
-- $|a_{jj}| > \displaystyle \sum_{i=1\\i\neq j}^n |a_ij|,\quad j=1, 2, \ldots, n$
+- $|a_{ii}| > \displaystyle \sum_{j=1\\j\neq i}^n |a_{ij}|,\quad i=1, 2, \ldots, n$.
+- $|a_{jj}| > \displaystyle \sum_{i=1\\i\neq j}^n |a_{ij}|,\quad j=1, 2, \ldots, n$
 
 The Jacobi iteration must converge.
 
-> **Proof**. 
-
-
+==TODO: Add the proofs.==
 
 
 
@@ -467,7 +456,7 @@ That is,
 $$
 (D+L)X = -UX + \by
 $$
-hence
+Hence
 $$
 X^{(k+1)} = -(D+L)^{-1}UX^{(k)} + (D+L)^{-1}\by
 $$
@@ -477,21 +466,10 @@ X^{k+1} = SX^{k} + \b f
 $$
 
 
-### Successive Over-Relaxation
 
+##### # Successive Over-Relaxation
 
-$$
-\begin{align}
-& X^{(k+1)} = X^{(k)} + \omega\Delta X^{(k)} \\
-& X^{(k+1)} = X^{(k)} + \omega(X^{(k+1)} - X^{(k)} ) \\
-& X^{(k+1)} = (1-\omega)X^{(k)} + \omega\Delta X^{(k+1)} \\
-\end{align}
-$$
-Hence
-$$
-X^{(k+1)} = (1-\omega)X^{(k)} + \omega(\widetilde LX^{(k+1)} + \widetilde UX^{(k)} + \bg)
-$$
-
+The SOR method is a variant of Gauss-Seidel method resulting in faster convergence:
 $$
 \left\{\begin{array}{ll}
 x_1^{(k+1)} = (1-\omega)x_1^{(k)} + \omega(b_{12}x_2^{k} + \cdots + b_{1n}x_n^{(k)} + g_1) \\
@@ -500,27 +478,35 @@ x_2^{(k+1)} = (1-\omega)x_2^{(k)} + \omega(b_{21}x_2^{k} + \cdots + b_{2n}x_n^{(
 x_2^{(k+1)} = (1-\omega)x_n^{(k)} + \omega(b_{n1}x_2^{(k+1)} + \cdots + b_{n, n-1}x_{n-1}^{(k+1)} + g_n) \\
 \end{array}\right.
 $$
+where $\omega$ is **relaxation factor**.
 
+The matrix form of SOR is $X^{(k+1)} = S_\omega X^{(k)} + \bf$, where
 $$
 \begin{align}
-& X^{(k+1)} = (1-\omega)X^{(k)} + \omega(\widetilde LX^{(k+1)} + \widetilde UX^{(k)} + \bg) \\
-& (I - \omega \widetilde L)X^{(k+1)} = ((1-\omega)I + \omega \widetilde U)X^{(k)} + \omega\bg \\
-& X^{(k+1)} = (I-\omega)
+S_w &= (I + \omega D^{-1}L)^{-1}[(1-\omega)I - \omega D^{-1}U] \\
+f   &= \omega(I + \omega D^{-1}L)Y
 \end{align}
 $$
 
+> **Proof**.
+> $$
+> \begin{align}
+> X^{(k+1)} &= (1-\omega)X^{(k)} + \omega(\widetilde LX^{(k+1)} + \widetilde UX^{(k)} + \bg) \\
+> (I - \omega \widetilde L)X^{(k+1)} &= ((1-\omega)I + \omega \widetilde U)X^{(k)} + \omega\bg \\
+> X^{(k+1)} &= (I-\omega \wL)^{-1}((1-\omega)I + \omega \wU)X^{(k)} + (I - \omega\wL)^{-1}\omega \bg
+> \end{align}
+> $$
+> where $\wL = -D^{-1}L, \wU = -D^{-1}U$.
 
 
+The necessary condition that SOR converges is $0 < \omega < 2$. Specially, if $A$ is the positive determined matrix, $0 < \omega <  2$ is also the sufficient condition.
 
-The necessary conditions of SOR is $0 < \omega < 2$ . 
+The iteration is called
 
-For succeeive iteration matrix $S_\omega$, the iteration converges if $\rho(S_\omega) < 1$, or $\norm{S_\omega}_p < 1$.
+- **Under-relaxation** iteration if $\omega \in (0, 1)$.
+- Gauss-Seidel iteration if $\omega = 1$.
+- **Over-relaxation** iteration if $\omega \in (1, 2)$.
 
-If $A$ is the positive determined matrix, $0 < \omega < 2$
-
-We call the SOR with $0 < \omega < 1$ as 
-
-
-
+The best $\omega$ (with fastest convergence speed) is hard to determine for specific equation.
 
 
