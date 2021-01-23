@@ -14,17 +14,16 @@
 %\begin{algorithm}
 %\caption{DoolittleDecomposition}
 \begin{algorithmic}[1]
-\Function{Doolittle\_decomposition}{$A$, $n$}
-\For{$k \gets 1$ to $n$}
-    \For{$j \gets k$ to $n$}
-        \State $u_{kj} \gets a_{kj} - \displaystyle\sum_{r=1}^{k-1}l_{kr}u_{rj}$
-    \EndFor
-    \For{$i \gets k+1$ to $n$}
-        \State $l_{ik} \gets \displaystyle\frac{1}{u_{kk}}\left( a_{ik} - \sum_{r=1}^{k-1}l_{ir}u_{rk} \right)$
-    \EndFor
+\Function{Cholesky\_decomposition}{$A$, $n$}
+
+\For{$j \gets 1$ to $n$}
+	\State $l_{jj} \gets \sqrt{a_{jj} - \displaystyle\sum_{k=1}^{j-1} l_{jk}^2}$
+	\For{$i \gets j+1$ to $n$}
+		\State $l_{ij} \gets \dfrac{1}{l_{jj}} \left(a_{ij} - \displaystyle\sum_{k=1}^{j-1} l_{ik}l_{jk} \right)$
+	\EndFor
 \EndFor
 
-\State \Return $L, U$
+\State \Return $L$
 
 \EndFunction
 \end{algorithmic}

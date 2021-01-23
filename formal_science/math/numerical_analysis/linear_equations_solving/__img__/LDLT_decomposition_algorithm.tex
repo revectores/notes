@@ -1,0 +1,20 @@
+\documentclass[varwidth]{standalone}
+\usepackage{amsmath}
+\usepackage[noend]{algpseudocode}
+
+\begin{document}
+\begin{algorithmic}[1]
+\Function{LDLT\_decomposition}{$A$, $n$}
+
+\For{$k \gets 1$ to $n$}
+	\State $d_k \gets a_{kk} - \displaystyle\sum_{r=1}^{k-1}d_{r}l_{kr}^2$
+	\For{$i \gets k+1$ to $n$}
+		\State $l_{ik} \gets \dfrac{1}{d_k}\left(a_{ik} - \displaystyle\sum_{r=1}^{k-1}d_{r}l_{ir}l_{kr} \right)$
+	\EndFor
+\EndFor
+
+\State \Return $L, D$
+
+\EndFunction
+\end{algorithmic}
+\end{document}

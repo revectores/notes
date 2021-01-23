@@ -14,7 +14,8 @@
 %\begin{algorithm}
 %\caption{Crout_decomposition}
 \begin{algorithmic}[1]
-\Function{Crout\_decomposition}{$n$, $A$, $y$}
+\Function{Crout\_decomposition}{$A$, $n$}
+
 \For{$k \gets 1$ to $n$}
     \For{$i \gets k$ to $n$}
         \State $l_{ik} \gets a_{ik} - \displaystyle\sum_{r=1}^{k-1}l_{ir}u_{rk}$
@@ -24,14 +25,7 @@
     \EndFor
 \EndFor
 
-\For{$i \gets 1$ to $n$}
-    \State $y_i \gets \displaystyle \frac{1}{l_{ii}}\left(b_i - \sum_{j=1}^{i-1}l_{ij}y_j\right)$
-\EndFor
-
-\For{$i \gets n$ to $1$}
-    \State $x_i \gets \displaystyle y_i - \sum_{j=i+1}^n u_{ij}x_j$
-\EndFor
-\State \Return $x_i, i = 1, 2, \ldots, n$
+\State \Return $L, U$
 
 \EndFunction
 \end{algorithmic}
