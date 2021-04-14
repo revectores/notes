@@ -38,3 +38,20 @@ and visualized as transition diagram:
 
 <img src="__img__/dfa_transition_diagram_demo.png" alt="dfa_demo" style="zoom:25%;" />
 
+
+
+##### # Regular Language
+
+We define the **extended transition function**:
+
+$$
+\hat\delta(q, w) = \delta(\hat\delta(q, x), a)
+$$
+where $w = xa$, that is, $a$ is the last symbol of $w$, and $x$ is the string consisting of all but the last symbol.
+
+Now the language of DFA $A = \{Q, \Sigma, \delta, q_0, F\}$ can be defined by
+$$
+L(A) = \{w \mid \hat\delta(q_0, w) \in F\}
+$$
+If $L$ is $L(A)$ for some DFA $A$, then we say $L$ is a **regular language**.
+
