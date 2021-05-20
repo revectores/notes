@@ -1,0 +1,70 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta}
+
+\newcommand{\digit}{\textbf{digit}}
+\begin{document}
+
+\tikzset{
+  heap/.style={
+    % every node/.style={minimum size=8mm},
+    level 1/.style={sibling distance=30mm, dotted},
+    level 2/.style={sibling distance=30mm, dotted},
+    level 3/.style={sibling distance=30mm, dotted}
+  }
+}
+
+\tikzset{>={Latex[width=1mm,length=2mm]}}
+
+
+\begin{tikzpicture}[heap]
+  \node(T){$T$}
+  child{node(F1){$F$}
+    child{node(digit1){$\digit$}}
+  }
+  child{edge from parent[draw=none]}
+  child{node(Tp1){$T'$}
+    child{node{$*$}}
+    child{node(F2){$F$}
+      child{node(digit2){$\digit$}}
+    }
+    child{node(Tp2){$T'$}
+      child{node{$\epsilon$}}
+    }
+  };
+
+  \node(T_val_value)      [right = 0.05mm of T]        {$9$};
+  \node(F1_val_value)     [right = 0.05mm of F1]       {$3$};
+  \node(F2_val_value)     [right = 0.05mm of F2]       {$4$};
+  \node(Tp1_inh_value)    [left = 0.05mm of Tp1]       {$5$};
+  \node(Tp2_inh_value)    [left = 0.05mm of Tp2]       {$6$};
+  \node(Tp1_syn_value)    [right = 0.05mm of Tp1]      {$8$};
+  \node(Tp2_syn_value)    [right = 0.05mm of Tp2]      {$7$};
+  \node(digit1_lexval_value) [right = 0.05mm of digit1]{$1$};
+  \node(digit2_lexval_value) [right = 0.05mm of digit2]{$2$};
+
+  \node(T_val) [right = 0.05mm of T_val_value]{$val$};
+  \node(F1_val)[right = 0.05mm of F1_val_value]{$val$};
+  \node(F2_val)[right = 0.05mm of F2_val_value]{$val$};
+  \node(Tp1_inh) [left = 0.05mm of Tp1_inh_value]{$inh$};
+  \node(Tp2_inh) [left = 0.05mm of Tp2_inh_value]{$inh$};
+  \node(Tp1_syn) [right = 0.05mm of Tp1_syn_value]{$syn$};
+  \node(Tp2_syn) [right = 0.05mm of Tp2_syn_value]{$syn$};
+  \node(digit1_lexval) [right = 0.05mm of digit1_lexval_value]{$lexval$};
+  \node(digit2_lexval) [right = 0.05mm of digit2_lexval_value]{$lexval$};
+  
+  \draw [->] (digit1_lexval_value)->(F1_val_value);
+  \draw [->] (digit2_lexval_value)->(F2_val_value);
+
+  \draw [->] (F1_val_value)[out=30,in=150] to (Tp1_inh_value);
+  \draw [->] (F2_val_value)[out=30,in=155] to (Tp2_inh_value);
+  \draw [->] (Tp1_inh_value)->(Tp2_inh_value);
+  \draw [->] (Tp2_inh_value)[out=320,in=210] to (Tp2_syn_value);
+  \draw [->] (Tp2_syn_value)->(Tp1_syn_value);
+
+  \draw [->] (Tp1_syn_value)->(T_val_value);
+
+
+\end{tikzpicture}
+\end{document}

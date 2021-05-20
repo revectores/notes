@@ -1,0 +1,42 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\newcommand{\digit}{\textbf{digit}}
+\begin{document}
+
+\tikzset{
+  heap/.style={
+    level 1/.style={sibling distance=30mm},
+    level 2/.style={sibling distance=30mm},
+    level 3/.style={sibling distance=30mm}
+  }
+}
+
+
+\begin{tikzpicture}[heap]
+  \node {$L.val = 19$}
+  child{edge from parent[draw=none]}
+  child{node{$E.val = 19$}
+    child{node{$E.val = 15$}
+      child{node{$T.val = 15$}
+        child{node{$T.val = 3$}
+          child{node{$F.val = 3$}
+            child{node{$\digit.lexval = 3$}}
+          }
+        }
+        child{node{$*$}}
+        child{node{$F.val = 5$}
+          child{node{$\digit.lexval = 5$}}
+        }
+      }
+    }
+    child{node{$+$}}
+    child{node{$T.val = 4$}
+      child{node{$F.val = 4$}
+        child{node{$\digit.lexval = 4$}}
+      }
+    }
+  }
+  child{node{$\textbf{n}$}}
+  ;
+\end{tikzpicture}
+\end{document}

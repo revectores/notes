@@ -1,0 +1,27 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\newcommand{\digit}{\textbf{digit}}
+\begin{document}
+
+\tikzset{
+  heap/.style={
+    level 1/.style={sibling distance=30mm, dotted},
+    level 2/.style={sibling distance=30mm, dotted},
+    level 3/.style={sibling distance=30mm, dotted}
+  }
+}
+
+
+\begin{tikzpicture}[heap]
+  \node(E){$E$}
+  child{node(E1){$E_1$}}
+  child{node(T){$T$}};
+  \node(E_val) [right = 0.1mm of E]{$val$};
+  \node(E1_val)[right = 0.1mm of E1]{$val$};
+  \node(T_val) [right = 0.1mm of T]{$val$};
+  \draw [->] (E1_val)->(E_val);
+  \draw [->] (T_val)->(E_val);
+
+\end{tikzpicture}
+\end{document}
