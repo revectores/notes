@@ -26,8 +26,6 @@ Formally, a Markov chain is specified by three components:
     \pi_i \ge 0, \quad \sum_{i=1}^n \pi_i = 1
     $$
 
-4. 
-
 The markov chain can be described as [undetermined finite state machine](), with probability on the arcs:
 
 ==TODO: Draw undetermined FSM to represent an instance of markov chain.==
@@ -80,8 +78,6 @@ A hidden Markov process is specified by five components:
     $$
     \pi_i \ge 0, \quad \sum_{i=1}^n \pi_i = 1
     $$
-
-6. 
 
 Hence we can denote HMM as a triple $\mu = (A, B, \pi)$ or quintuple $\mu = (Q, O, A, B, \pi)$.
 
