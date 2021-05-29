@@ -1,32 +1,40 @@
-# Deterministic Finite Automaton
 
-##### # DFA: Definition
 
-A **deterministic finite automaton** is a five-tuple pair $A = (Q, \Sigma, \delta, q_0, F)$:
+## 1. Basic Concepts
 
-1. A finite set of states $Q$.
-2. A finite set of input symbols $\Sigma$.
-3. A start state $q_0 \in Q$.
-5. A set of **final (accpeting) states** $F\sub Q$.
-5. A **transition function** $\delta$ that takes a state and an input as arguments symbol and returns a state.
+##### # Definition
 
-**Transition diagram** and **transition table** are two preferred notations for describing automata which provides better intuitive.
+A **deterministic finite automaton** is a five-tuple pair $A = (Q, \Sigma, \delta, q_0, F)$, where
 
-For instance, consider language
-$$
-L = \{\omega \mid x01y,~ x,y\in\{0, 1\}^* \}
-$$
-The five-tuple are $A = (\{q_0, q_1, q_2\}, \{0, 1\}, \delta, q_0, \{q_2\})$, where the $\delta$ can be given by
-$$
-\delta(q_0, 0) = q_1    \qquad
-\delta(q_0, 1) = q_0    \qquad \\
-\delta(q_1, 0) = q_0    \qquad
-\delta(q_1, 1) = q_2    \qquad \\
-\delta(q_2, 0) = q_2    \qquad
-\delta(q_2, 1) = q_2    \qquad \\
-$$
+- Q is a finite set of states.
+- $\Sigma$ is a finite set of input symbols $\Sigma$.
+- $q_0$ is the start state.
+- $F \subset Q$ is a set of **final (accpeting) states**.
+- $\delta$ is a **transition function** that takes a state and an input as arguments symbol and returns a state.
 
-This can be simplified to transition table:
+> **Example of DFA**. For instance, consider language
+> $$
+> L = \{\omega \mid x01y,~ x,y\in\{0, 1\}^* \}
+> $$
+> which can be expressed by the DFA $A = (\{q_0, q_1, q_2\}, \{0, 1\}, \delta, q_0, \{q_2\})$, where the $\delta$ is defined by
+> $$
+> \delta(q_0, 0) = q_1    \qquad
+> \delta(q_0, 1) = q_0    \qquad \\
+> \delta(q_1, 0) = q_0    \qquad
+> \delta(q_1, 1) = q_2    \qquad \\
+> \delta(q_2, 0) = q_2    \qquad
+> \delta(q_2, 1) = q_2    \qquad \\
+> $$
+>
+> 
+
+
+
+##### # Representation
+
+**Transition diagram** and **transition table** are two preferred notations to represent DFA, as also other automata, since they are more intuitive to human beings.
+
+The DFA given previously can be expressed by a transition table:
 
 |       |  $0$  |  $1$  |
 | :---: | :---: | :---: |
@@ -40,18 +48,27 @@ and visualized as transition diagram:
 
 
 
-##### # Regular Language
+##### # Extended Transition Function
 
-We define the **extended transition function**:
+The built-in transition function of DFA only consumes one symbol at a time. It can be convient to extend this notation to define a new operation that consumes multiple symbols (that is, a string), at a time, and produce the result given by the string path.
 
+To formalize this idea, we define the **extended transition function** by mathematical induction:
 $$
 \hat\delta(q, w) = \delta(\hat\delta(q, x), a)
 $$
 where $w = xa$, that is, $a$ is the last symbol of $w$, and $x$ is the string consisting of all but the last symbol.
 
-Now the language of DFA $A = \{Q, \Sigma, \delta, q_0, F\}$ can be defined by
+
+
+
+
+
+
+## 2. Regular Language
+
+Using notation of extended transition function, the **language of DFA** $A = \{Q, \Sigma, \delta, q_0, F\}$ can be defined as
 $$
 L(A) = \{w \mid \hat\delta(q_0, w) \in F\}
 $$
-If $L$ is $L(A)$ for some DFA $A$, then we say $L$ is a **regular language**.
+If $L$ can be expressed by some DFA, formally, if $L$ is $L(A)$ for some DFA $A$, we call $L$ a **regular language**.
 
