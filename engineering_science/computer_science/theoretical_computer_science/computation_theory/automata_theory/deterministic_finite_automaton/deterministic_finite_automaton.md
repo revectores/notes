@@ -52,11 +52,11 @@ and visualized as transition diagram:
 
 The built-in transition function of DFA only consumes one symbol at a time. It can be convient to extend this notation to define a new operation that consumes multiple symbols (that is, a string), at a time, and produce the result given by the string path.
 
-To formalize this idea, we define the **extended transition function** by mathematical induction:
-$$
-\hat\delta(q, w) = \delta(\hat\delta(q, x), a)
-$$
-where $w = xa$, that is, $a$ is the last symbol of $w$, and $x$ is the string consisting of all but the last symbol.
+To formalize this idea, we define the **extended transition function** by applying mathematical induction:
+
+**Basis**. $\hat\delta(q, \varepsilon) = q$.
+
+**Induction**. $\hat\delta(q, w) = \delta(\hat\delta(q, x), a)$, where $w = xa$, that is, $a$ is the last symbol of $w$, and $x$ is the string consisting of all but the last symbol.
 
 
 
