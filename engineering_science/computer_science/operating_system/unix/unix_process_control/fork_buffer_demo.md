@@ -56,7 +56,7 @@ for (int i = 0; i < 2; i++){
 }
 ```
 
-Or you can simply bypass the stupid `printf`. Output from wrapper of system call `write` will not be buffered:
+Or you can simply bypass the stupid `printf`. Output from wrapper of system call `write` will not be buffered in user space:
 
 [fork_write.c](__src__/fork_write.c)
 
