@@ -70,3 +70,98 @@ Consider the class of description methods consisting of all partial functions ov
 > 
 > Therefore, $f$ cannot be additively optimal. Thus, there is no additively optimal partial function, and the hierarchy of complexities with respect to the partial functions does not have any minimal element.
 
+
+
+
+
+
+
+### 2. The Invariance Theorem
+
+##### # The Invariance Theorem: Unconditional Form
+
+The development of the theory of Kolmogorov complexity is made possible by the remarkable fact that, the class of [partial recursive functions]() possesses a universal element that is additively optimal. This is quite a natural restriction of description methods, since the partial recursive functions are precisely the functions that can be computed by [Turing machines]().
+
+> **The Invariance Theorem: Unconditional Form**. There is an additively optimal universal partial recursive function.
+>
+> **Proof**. Let $\phi_0$ be the function computed by a universal Turing machine $U$, which expects inputs of the format
+> 
+> $$
+> \pair n p = 1^{l(n)}0n~p
+> $$
+> 
+> The interpretation is that the total program $\left< n, p \right>$ is a two-part code of which the first part $1^{l(n)}0n$ consists of a self-delimiting encoding of $T_n$, and the second part $p$ is the literally rendered program $p$. In this way, $U$ can first parse the binary input to the $T_n$-part and the $p$-part, and subsequently **simulate** the computation of $T_n$ started with program $p$ as its input. That is,
+> 
+> $$
+> \phi_0(\pair n p) = \phi_n(p)
+> $$
+> 
+> Specially, we set $U = T_0$ to deal with $\left<n, p\right> = 0p$ case. Now if $T_n$ computes the partial recursive function $\phi_n$, then
+> 
+> $$
+> C_{\phi_0}(x) \le C_{\phi_n}(x) + c_{\phi_n}
+> $$
+> 
+> where $c_{\phi_n}$ can be set to $2l(n) + 1$.
+
+
+
+##### # The Invariance Theorem: Conditional Form
+
+Generally, the complexity $C_\phi$ of $x$ **conditional to** $y$ is defined by
+
+$$
+C_\phi(x|y) = \min\{l(p): \phi \pair y p = x\}
+$$
+
+and $C_\phi(x|y) = \infty$ if there are no such $p$. We call $p$ a program to compute $x$ by $\phi$, given $y$.
+
+> **The Invariance Theorem: Conditional Form**. There is an additively optimal universal partial recursive function $\phi_0$ for the class of partical recursive functions to compute $x$ given $y$. Therefore,
+> 
+> $$
+> C_{\phi}(x|y) \le C_\phi(x|y) + c_\phi
+> $$
+> 
+> for all partical recursive functions $\phi$ nad all $x$ and $y$.
+>
+> **Proof**. Let $\phi_0$ be the function computed by a universal Turing machine $U$ such that $U$ started on input $\pair{y}{\pair n p}$ simulates $T_n$ on input $\pair y p$. That is, if $T_n$ computes the partial recursive function $\phi_n$, then
+> 
+> $$
+> \phi_0(\pair{y}{\pair n p}) = \phi_n(\pair y p)
+> $$
+> 
+> Hence, for all $n$
+> 
+> $$
+> C_{\phi_0}(x|y) \le C_{\phi_n}(x|y) + c_{\phi_n}
+> $$
+> 
+> where $c_{\phi_n} = 2l(n) + 1$.
+
+The key point is not that the universal description method necessarily gives the shortest description in each case, but that **no other description method can improve on it infinitely by more than a fixed constant**.
+
+For every pair $\psi, \psi'$ of additively optimal functions, there is a fixed constant $c_{\psi, \psi'}$, depending only on $\psi$ and $\psi'$, such that for all $x, y$ we have
+
+$$
+\left|C_{\psi}(x|y) - C_{\psi'}(x|y) \right| \le c_{\psi, \psi'}
+$$
+
+The proof can be easily given by substitute $\phi_0 = \psi, \phi = \psi'$ then substitute $\phi = \psi, \phi_0 = \psi'$. While the complexities according to $\psi$ and $\psi'$ are not exactly, they are **equal up to a fixed constant** for all $x$ and $y$.
+
+
+
+##### # Kolmogorov Complexity
+
+Now we define the **conditional Kolmogorov complexity** $C(\cdot|\cdot)$ by fixing an additively optimal universal $\phi_0$
+
+$$
+C(x|y) = C_{\phi_0}(x|y)
+$$
+
+This particualr $\phi_0$ is called the **reference function** for $C$.
+
+The **unconditional Kolmogorov complexity** $C(\cdot)$ can be considered as a special case
+
+$$
+C(x) = C(x|\epsilon)
+$$
