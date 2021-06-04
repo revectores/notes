@@ -23,7 +23,7 @@ Some process identifers are specialized to specific processes. For example, in m
 
 ##### 2. `fork`
 
-We create(duplicate) a new child process by `fork`:
+We duplicate one process to create a new child process by invoking `fork`:
 
 ```c
 #include <unistd.h>
@@ -32,7 +32,7 @@ pid_t fork(void);
 
 `fork` returns 0 in child, process ID of the child in parent, -1 on error.
 
-We'll explain the behaviour of `fork` by a demo program, and also the common structure of a function that invokes `fork`:
+We'll explain the behaviour of `fork` by a demo program [fork_demo.c](__src__/fork_demo.c), which provides a typical structure of a program that invokes `fork`:
 
 ```c
 #include <stdio.h>
@@ -66,11 +66,13 @@ hello, I am parent of 10694 (pid: 10693)
 
 by invoking `fork`, the process was duplicated to create a child, and the child starts running from the line `int rc = fork()`(not from the beginning of function, and this is somewhat impossible actually...). At this line, one `fork` call generates two values: for the parent, `fork` returns the pid of child if success, and for the child, `fork` returns 0. Hence, the conditional statement about `rc` helps us distingulish whether its the parent or child process.
 
-Notice that for the two different processes, the sequence of execution is not determinant, which is depends on the scheduling by CPU. As a result, the output for the given demo is not determined, the output from the child and the parent might exchange.
+Notice that the sequence of execution of parent process and child process is not determinant, depending on scheduling handling by operating system. As a result, the output for the demo above is not determined, the output from the child and the parent might exchange.
 
-File [fork_file_sharing_example.md](fork_file_sharing_example.md) gives a more complex example relavent to the file descriptor sharing between parent process and its children, providing by APUE.
+The semantics of fork is complex and multiple examples shall be provided to show their significances in practice:
 
-Due to the counterintuitive design of `fork`, the behaviour of the child process should be carefully taken care of. [a_fork_bug.md](a_fork_bug.md) gives an tricky bug (maybe not that tricky after we found it...) that caused by the misunderstanding about how `fork` works, raised during the development of shell.
+- [fork_output_buffer_demo.md](fork_output_buffer_demo.md) shows that `fork` copies the output buffer from parent to child, which might lead to some unexpected behaviours.
+- [fork_file_sharing_example.md](fork_file_sharing_example.md) gives a more complex example relavent to the file descriptor sharing between parent process and its children, providing by APUE.
+- [a_fork_bug.md](a_fork_bug.md) gives an tricky bug (maybe not that tricky after we found it...) that caused by the misunderstanding about how `fork` works, raised during the development of shell.
 
 
 
@@ -134,14 +136,3 @@ int main(int argc, char* argv[]){
     }    
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
