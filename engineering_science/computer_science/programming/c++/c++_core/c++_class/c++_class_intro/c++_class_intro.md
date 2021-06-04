@@ -4,7 +4,7 @@
 
 ##### # Introduction by Instance
 
-[`c++_class_demo.cpp`](c++_class_demo/c++_class_demo.cpp) is a demo for c++ class, which shows the following usages:
+[`c++_class_demo.cpp`](__src__/c++_class_demo.cpp) is a demo for c++ class, which shows the following usages:
 
 1. Access control: `private` and `public` keyword.
 2. Construtor and destructor.
@@ -53,7 +53,7 @@ Complex(): _re(0), _im(0) {};
 
 ##### # Example of Inheritance
 
-[`c++_class_inheritance_example.cpp`](c++_class_inheritance_example/c++_class_inheritance_example.cpp) is the example about how C++ create inheritance:
+[`c++_class_inheritance_example.cpp`](__src__/c++_class_inheritance_example.cpp) is the example about how C++ create inheritance:
 
 ```c++
 class Employee {
