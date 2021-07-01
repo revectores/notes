@@ -365,3 +365,29 @@ bool verify_checksums = false;
 ```
 
 `leveldb::RepairDB` function may be used to recover as much data as possible if the database is corrupted.
+
+
+
+
+
+
+
+
+### 6. Environment and Porting
+
+##### # Environment
+
+```{.c++ .numberLines startFrom="61" filename="include/options.h"}
+// Use the specified object to interact with the environment,
+// e.g. to read/write files, schedule background work, etc.
+// Default: Env::Default()
+Env* env;
+```
+
+All file system calls issued by the leveldb implementation are routed through `leveldb::Env` object. Set the `Options::env` to a custom Env implementation to get a better control.
+
+
+
+##### # Porting
+
+leveldb may be ported to a new platform by providing platform specific implementation of types/methods/function exported by `leveldb/port/port.h`. In addition, the new platform may need a new default `leveldb::Env` implementation.
