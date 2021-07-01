@@ -125,6 +125,20 @@ db->ReleaseSnapshot(options.snapshot);
 
 
 
+##### # Approximate Sizes
+
+The `GetApproximateSizes` method can be used to get the number of bytes of file system space used by one or more key ranges:
+
+```c++
+leveldb::Range ranges[2];
+ranges[0] = leveldb::Range("a", "c");
+ranges[1] = leveldb::Range("x", "z");
+uint64_t sizes[2];
+db->GetApproximateSizes(ranges, 2, sizes);
+```
+
+
+
 
 
 
