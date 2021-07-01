@@ -164,3 +164,39 @@ Slice(const char* s) : data_(s), size_(strlen(s)) {}
 ```
 
 
+
+
+
+
+
+### 3. Comparators
+
+leveldb sorts keys lexicographically by default. User-defined comparator can be used as well:
+
+```c++
+// This comparator is the same as the default one, demonstrating the syntax.
+class MyComparator : public leveldb::Comparator {
+public:
+  int Compare(const leveldb::Slice& key1, const leveldb::Slice& key2) const {
+    if (key1 > key2) return  1;
+	  if (key1 < key2) return -1;
+    return 0;
+  }
+
+  const char* Name() const {return "MyComparator";}
+  void FindShortestSeparator(std::string*, const leveldb::Slice&) const {}
+  void FindShortSuccessor(std::string*) const {}
+};
+```
+
+Create database using custom comparator:
+
+```c++
+MyComparator cmp;
+leveldb::DB* db;
+leveldb::Options options;
+options.create_if_missing = true;
+options.comparator = &cmp;
+leveldb::Status s = leveldb::DB::Open(options, "/tmp/testdb", &db);
+```
+
