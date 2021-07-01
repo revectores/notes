@@ -1,4 +1,4 @@
-# Leveldb Interface
+# leveldb Interface
 
 The leveldb library provides a persistent key-value store. Keys and values are arbitrary byte arrays. The keys are ordered within the key value store according to a user-specified comparator function.
 
@@ -58,9 +58,9 @@ if (s.ok()) {
 }
 ```
 
-Internally even a single operation is packaged as a batch and transferred to DB::Write method:
+Internally even a single operation is packaged as a batch and transferred to `DB::Write` method:
 
-```{.c++ .numberLines startFrom="1469"}
+```{.c++ .numberLines startFrom="1469" filename="db/db_impl.cc"}
 Status DB::Put(const WriteOptions& opt, const Slice& key, const Slice& value) {
   WriteBatch batch;
   batch.Put(key, value);
@@ -78,7 +78,7 @@ Status DB::Delete(const WriteOptions& opt, const Slice& key) {
 
 ##### # Synchronous Writes
 
-By default, each write to leveldb is asynchronous: it returns after pushing the write from the process into the operating system. The transfer from operating system memory to the underlying persistent storage happens asynchronously. The `sync` flag can be turned on for a particular write to make the write opeartion not return until the data being written has been pushed all the way to persistent storage (implemented based on `fsync()` or `fdatasync()` or `msync(, MS_SYNC)` on POSIX systems):
+By default, each write to leveldb is asynchronous: it returns after pushing the write from the process into the operating system. The transfer from operating system memory to the underlying persistent storage happens asynchronously. The `sync` flag can be turned on for a particular write to make the write opeartion not return until the data being written has been pushed all the way to persistent storage (implemented based on [`fsync()`]() or [`fdatasync()`]() or [`msync(..., MS_SYNC)`]() on POSIX systems):
 
 ```c++
 leveldb::WriteOptions write_options;
@@ -88,9 +88,79 @@ db->Put(write_options, ...);
 
 
 
-##### # Concurrency
+##### # Iteration
 
-Leveldb supports only one process with multiple threads opening a database at a time.
+To iterate all keys in a database:
 
+```c++
+leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
+for (it->SeekToFirst(); it->Valid(); it->Next()){
+  printf("%s: %s\n", it->key().ToString(), it->value().ToString());
+};
+delete it;
+```
+
+Since keys are comparable we can limit the range when iteration by `lower < it < upper`.
+
+Iterate backwards:
+
+```c++
+for (it->SeekToLast(); it->Valid(); it->Prev());
+```
+
+
+
+##### # Snapshots
+
+Snapshots provide consistent read-only views over the entire state of key-value store. Set `ReadOptions::snapshot` to indicate which version of the database to read (if `ReadOptions::snapshot` is `NULL` the read will operate on an implicit snapshot of the current state):
+
+```c++
+leveldb::ReadOptions options;
+options.snapshot = db->GetSnapshot();
+
+leveldb::Iterator iter = db->NewIterator(options);
+delete iter;
+db->ReleaseSnapshot(options.snapshot);
+```
+
+
+
+
+
+
+
+### 2. Data Types
+
+##### # Slice
+
+During iteration the return value of `it->key()` and `it->value()` are both `leveldb::Slice`, which contains a length and a pointer to an external byte array:
+
+```{.c++ .numberLines startFrom="88" filename="include/leveldb/slice.h"}
+private:
+  const char* data_;
+  size_t size_;
+```
+
+Hence `ToString()` is implemented by
+
+```{.c++ .numberLines startFrom="75" filename="include/leveldb/slice.h"}
+std::string ToString() const { return std::string(data_, size_); }
+```
+
+Constructors building C++ strings and C-style strings are supported:
+
+```{.c++ .numberLines startFrom="29" filename="include/leveldb/slice.h"}
+// Create an empty slice.
+Slice() : data_(""), size_(0) {}
+
+// Create a slice that refers to d[0,n-1].
+Slice(const char* d, size_t n) : data_(d), size_(n) {}
+
+// Create a slice that refers to the contents of "s"
+Slice(const std::string& s) : data_(s.data()), size_(s.size()) {}
+
+// Create a slice that refers to s[0,strlen(s)-1]
+Slice(const char* s) : data_(s), size_(strlen(s)) {}
+```
 
 
