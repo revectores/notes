@@ -301,3 +301,26 @@ leveldb::Iterator* it = db->NewIterator(options);
 
 
 
+##### # Filter
+
+```{.c++ .numberLines startFrom="139" filename="include/options.h"}
+// If non-null, use the specified filter policy to reduce disk reads.
+// Many applications will benefit from passing the result of
+// NewBloomFilterPolicy() here.
+const FilterPolicy* filter_policy = nullptr;
+```
+
+A filter detects whether a key is in the database without actually execute the database access hence reduce substantial disk reads. set `Options::filter_policy` to enable a filter:
+
+```c++
+options.filter_policy = NewBloomFilterPolicy(10);
+```
+
+If the equivalence class of keys are custom (for instance, ignores all the trailing space in keys), you should also provide a custom filter that apply the same policy instead using the built-in `NewBloomFilterPolicy()`.
+
+
+
+##### # Key Layout
+
+Adjacent keys will usaully be placed in the same block. Thus the performance can be improved by placing keys frequently accessed together near each other, which requires careful design of the keyspace.
+
