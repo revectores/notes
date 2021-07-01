@@ -338,3 +338,30 @@ If the equivalence class of keys are custom (for instance, ignores all the trail
 
 Adjacent keys will usaully be placed in the same block. Thus the performance can be improved by placing keys frequently accessed together near each other, which requires careful design of the keyspace.
 
+
+
+
+
+
+
+
+### 5. Checking Mechanism
+
+`Options::paranoid_checks` and `ReadOptions::verify_checksums` provides corruption detection when opening a dastabaes and reading the data respectively:
+
+```{.c++ .numberLines startFrom="54" filename="include/options.h"}
+// If true, the implementation will do aggressive checking of the
+// data it is processing and will stop early if it detects any
+// errors.  This may have unforeseen ramifications: for example, a
+// corruption of one DB entry may cause a large number of entries to
+// become unreadable or for the entire DB to become unopenable.
+bool paranoid_checks = false;
+```
+
+```{.c++ .numberLines startFrom="149" filename="include/options.h"}
+// If true, all data read from underlying storage will be
+// verified against corresponding checksums.
+bool verify_checksums = false;
+```
+
+`leveldb::RepairDB` function may be used to recover as much data as possible if the database is corrupted.
