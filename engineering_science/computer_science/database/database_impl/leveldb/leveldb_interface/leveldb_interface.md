@@ -200,3 +200,104 @@ options.comparator = &cmp;
 leveldb::Status s = leveldb::DB::Open(options, "/tmp/testdb", &db);
 ```
 
+
+
+
+
+
+
+### 4. Performance
+
+Performance can be tuned by changing the default values of the types defined in `include/options.h`.
+
+##### # Block Size
+
+```{.c++ .numberLines startFrom="96" filename="include/options.h"}
+// Approximate size of user data packed per block.  Note that the
+// block size specified here corresponds to uncompressed data.  The
+// actual size of the unit read from disk may be smaller if
+// compression is enabled.  This parameter can be changed dynamically.
+size_t block_size = 4 * 1024;
+```
+
+leveldb groups adjacent keys together into the same block and such a block is the unit of transfer to and from persistent storage. The deafult block size is **approximately** 4096 **uncompressed** bytes.
+
+- Applications that mostly do bulk scans over the contents of the database may wish to increase the size.
+- Applications that do a lot of point reads of small values may wish to switch to a smaller block size if performance measurements indicate an improvement. Compression will be more effective with larger block sizes.
+
+
+
+##### # Compression
+
+```{.c++ .numberLines startFrom="21" filename="include/options.h"}
+// DB contents are stored in a set of blocks, each of which holds a
+// sequence of key,value pairs.  Each block may be compressed before
+// being stored in a file.  The following enum describes which
+// compression method (if any) is used to compress a block.
+enum CompressionType {
+  // NOTE: do not change the values of existing entries, as these are
+  // part of the persistent format on disk.
+  kNoCompression = 0x0,
+  kSnappyCompression = 0x1
+};
+```
+
+
+```{.c++ .numberLines startFrom="117" filename="include/options.h"}
+// Compress blocks using the specified compression algorithm.  This
+// parameter can be changed dynamically.
+//
+// Default: kSnappyCompression, which gives lightweight but fast
+// compression.
+//
+// Typical speeds of kSnappyCompression on an Intel(R) Core(TM)2 2.4GHz:
+//    ~200-500MB/s compression
+//    ~400-800MB/s decompression
+// Note that these speeds are significantly faster than most
+// persistent storage speeds, and therefore it is typically never
+// worth switching to kNoCompression.  Even if the input data is
+// incompressible, the kSnappyCompression implementation will
+// efficiently detect that and will switch to uncompressed mode.
+CompressionType compression = kSnappyCompression;
+```
+
+Each block is individually compressed before being written to persistent storage. Compression is on by default since [`Snappy`](https://en.wikipedia.org/wiki/Snappy_(compression)) algorithm is very fast, and is automatically disabled for uncompressible data.
+
+
+
+##### # Cache
+
+
+```{.c++ .numberLines startFrom="92" filename="include/options.h"}
+// If non-null, use the specified cache for blocks.
+// If null, leveldb will automatically create and use an 8MB internal cache.
+Cache* block_cache = nullptr;
+```
+
+LRU Cache can be used to cache uncompressed block contents in memory (Caching of compressed blocks is left to the operation system buffer cache, or any custom `Env` implementation provided by client):
+
+```c++
+#include "leveldb/cache.h"
+leveldb::Options options;
+options.block_cache = leveldb::NewLRUCache(100 * 1048576);
+// ...
+```
+
+Caching mechanism can be temporily disabled by turning `ReadOptions::fill_cache` off:
+
+```{.c++ .numberLines startFrom="153" filename="include/options.h"}
+// Should the data read for this iteration be cached in memory?
+// Callers may wish to set this field to false for bulk scans.
+bool fill_cache = true;
+```
+
+For instance, during iteration:
+
+```c++
+leveldb::ReadOptions options;
+options.fill_cache = false;
+leveldb::Iterator* it = db->NewIterator(options);
+```
+
+
+
