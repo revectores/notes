@@ -148,6 +148,40 @@ private:
 
 
 
+##### # `VersionEdit`
+
+`VersionEdit` is the entity modeling `diff` bewteen `Version`. When applying a compaction, a `VersionEdit` object is built at first and applied to current `Version` to get the new version after compaction:
+
+|                       Member Variables                       |                        Interpretation                        |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+|      `compact_pointers`, `deleted_files_`, `new_files_`      | modifications on current version, computed by consuming `Compaction` object. |
+| `comparator_`, `log_number_`, `prev_log_number_`, `next_file_number`, `last_sequence_` |                  version state information                   |
+| `has_comparator_`, `has_log_number_`, `has_prev_log_number_`, `has_next_file_number_`, `has_last_sequence_` |    flags to indicate whether the state information valid     |
+
+```c++
+class VersionEdit {
+private:
+  typedef std::set<std::pair<int, uint64_t>> DeletedFileSet;
+
+  std::string comparator_;
+  uint64_t log_number_;
+  uint64_t prev_log_number_;
+  uint64_t next_file_number_;
+  SequenceNumber last_sequence_;
+  bool has_comparator_;
+  bool has_log_number_;
+  bool has_prev_log_number_;
+  bool has_next_file_number_;
+  bool has_last_sequence_;
+
+  std::vector<std::pair<int, InternalKey>> compact_pointers_;
+  DeletedFileSet deleted_files_;
+  std::vector<std::pair<int, FileMetaData>> new_files_;
+}
+```
+
+
+
 
 
 
