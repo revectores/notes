@@ -177,7 +177,7 @@ Refer to [4. Minor Compaction](#4. Minor Compaction) for details of `CompactMemT
 
 otherwise we generate the compaction:
 
-- If the compaction is manually invoked, use `CompactRange()` to search for those `sstable` based on `level`, `begin`, `end` provided by user. Refer to [5. Search Tables in Given Range](#5. Search Table in Given Range) for details of `CompactRange()`.
+- If the compaction is manually invoked, use `CompactRange()` to search for those `sstable` based on `level`, `begin`, `end` provided by user. Refer to [5. Search Tables in Given Range](#5. Search Tables in Given Range) for details of `CompactRange()`.
 - If the compaction is automatically inovked, use `PickCompaction()` to search for the best level to compact. Refer to [6. Pick Table to Compact](#6. Pick Table to Compact) for details of `PickCompaction()`.
 
 ```c++
@@ -394,3 +394,52 @@ s = builder->Finish();
 ```
 
 Writing stuff is done inside `build->Finish()`.
+
+
+
+
+
+
+
+### 5. Search Tables in Given Range
+
+`CompactRange` searches those `sstable` in given level which are overlapped with range `[begin, end]` by three steps:
+
+1. `GetOverlappingInputs` to get the set of `sstable` which are overlapped with range `[begin, end]`, store them in `std::vector<FileMetaData*> inputs`.
+2. Reduce number of file to compact for levels ≥ 1. The limit is set to `max_file_size = 2 * 1024 * 1024`, which is configurable.
+3. Search for those `sstables` which are overlapped with `inputs_[0]` in the upper level, this make up `inputs_[1]`.
+
+```c++
+Compaction* VersionSet::CompactRange(int level, const InternalKey* begin,
+                                     const InternalKey* end) {
+  std::vector<FileMetaData*> inputs;
+  current_->GetOverlappingInputs(level, begin, end, &inputs);
+  if (inputs.empty()) {
+    return nullptr;
+  }
+
+  // Avoid compacting too much in one shot in case the range is large.
+  // But we cannot do this for level-0 since level-0 files can overlap
+  // and we must not pick one file and drop another older file if the
+  // two files overlap.
+  if (level > 0) {
+    const uint64_t limit = MaxFileSizeForLevel(options_, level);
+    uint64_t total = 0;
+    for (size_t i = 0; i < inputs.size(); i++) {
+      uint64_t s = inputs[i]->file_size;
+      total += s;
+      if (total >= limit) {
+        inputs.resize(i + 1);
+        break;
+      }
+    }
+  }
+
+  Compaction* c = new Compaction(options_, level);
+  c->input_version_ = current_;
+  c->input_version_->Ref();
+  c->inputs_[0] = inputs;
+  SetupOtherInputs(c);
+  return c;
+}
+```
