@@ -1,4 +1,4 @@
-# leveldb Versions and Compaction
+# leveldb Compaction
 
 ### 1. Class Definition
 
@@ -178,7 +178,7 @@ Refer to [4. Minor Compaction](#4. Minor Compaction) for details of `CompactMemT
 otherwise we generate the compaction:
 
 - If the compaction is manually invoked, use `CompactRange()` to search for those `sstable` based on `level`, `begin`, `end` provided by user. Refer to [5. Search Tables in Given Range](#5. Search Table in Given Range) for details of `CompactRange()`.
-- If the compaction is automatically inovked, use `PickCompaction()` to search for the best level to compact. Refer to [6. Rules of Picking Compaction](#6. Rules of Picking Compaction) for details of `PickCompaction()`.
+- If the compaction is automatically inovked, use `PickCompaction()` to search for the best level to compact. Refer to [6. Pick Table to Compact](#6. Pick Table to Compact) for details of `PickCompaction()`.
 
 ```c++
 Compaction* c;
@@ -234,7 +234,7 @@ if (c == nullptr) {
 }
 ```
 
-The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Inside `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current version.
+The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Refer to [7. Merge Tables](#7. Merge Tables) for details of `DoCompactionWork()`. Inside it `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current `version`. Refer to [8. Apply Modification to Version](#8.Apply Modification to Version) for details.
 
 
 
@@ -316,7 +316,7 @@ void VersionSet::Finalize(Version* v) {
 }
 ```
 
-By trancing into `VersionSet::Finalize()` we can finally translate `v->compaction_score_ >= 1` to human language:
+Now we can finally translate `v->compaction_score_ >= 1` to human language:
 
 - If the number of files in level-0 ≥ kL0_CompactionTrigger (4 by default).
 - If the total size of files in level-L  ≥ MaxBytesForLevel ($10^L$ MB by default).
@@ -338,4 +338,59 @@ bool Version::UpdateStats(const GetStats& stats) {
 }
 ```
 
-which keeps the `file_to_compact_` up-to-date.
+which keeps the `file_to_compact_` and `file_to_compact_level_` up-to-date.
+
+
+
+
+
+
+
+### 4. Minor Compaction
+
+Minor compaction is done by method `CompactMemTable()`. Here the two invocation `WriteLevel0Table()` and `LogAndApply()` are the core:
+
+- `WriteLevel0Table()` **write** `sstable` file and returns `VersionEdit` object.
+- `LogAndApply()` apply the `VersionEdit` object to current version. This function is also called during major compaction. Refer to [8. Apply Modification to Version](#8. Apply Modification to Version) for details.
+
+Note that the `LogAndApply()` does NOT interact with external stroage at all: it only apply those abstract objects `VersionEdit` and `Version`.
+
+In addition some cleaning stuff will be done in `RemoveObsoleteFiles()`. This function is also called during major compaction.
+
+```c++
+void DBImpl::CompactMemTable() {
+  VersionEdit edit;
+  Version* base = versions_->current();
+	WriteLevel0Table(imm_, &edit, base);
+  versions_->LogAndApply(&edit, &mutex_);
+  RemoveObsoleteFiles();
+}
+```
+
+`WriteLevel0Table()` build a `Iterator` and pass it to `BuildTable()`, which iterates key-value pair to write a `sstable` file (some information that helps to build `edit` is also collected inside).
+
+Different from the theoretical LSM-tree design, leveldb try to upgrade the newly generated `sstable` to higher level. Which level the new table should be placed is determined by `PickLevelForMemTableOutput()`.
+
+Final work is to make up the `edit` based on level and collected metadata to feed to caller `CompactMemTable()`.
+
+```c++
+Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit, Version* base){
+	Iterator* iter = mem->NewIterator();
+	BuildTable(dbname_, env_, options_, table_cache_, iter, &meta);
+	level = base->PickLevelForMemTableOutput(min_user_key, max_user_key);
+	edit->AddFile(level, meta.number, meta.file_size, meta.smallest, meta.largest);
+}
+```
+
+The core of `BuildTable()` is building the `builder` by iterating `iter` to emit key-value pairs:
+
+```c++
+TableBuilder* builder = new TableBuilder(options, file);
+for (; iter->Valid(); iter->Next()) {
+  key = iter->key();
+  builder->Add(key, iter->value());
+}
+s = builder->Finish();
+```
+
+Writing stuff is done inside `build->Finish()`.
