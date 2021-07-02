@@ -234,7 +234,7 @@ if (c == nullptr) {
 }
 ```
 
-The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Refer to [7. Merge Tables](#7. Merge Tables) for details of `DoCompactionWork()`. Inside it `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current `version`. Refer to [8. Apply Modification to Version](#8.Apply Modification to Version) for details.
+The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Refer to [7. Merge Tables](#7. Merge Tables) for details of `DoCompactionWork()`. Inside it `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current `version`. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
 
 
 
@@ -351,7 +351,7 @@ which keeps the `file_to_compact_` and `file_to_compact_level_` up-to-date.
 Minor compaction is done by method `CompactMemTable()`. Here the two invocation `WriteLevel0Table()` and `LogAndApply()` are the core:
 
 - `WriteLevel0Table()` **write** `sstable` file and returns `VersionEdit` object.
-- `LogAndApply()` apply the `VersionEdit` object to current version. This function is also called during major compaction. Refer to [8. Apply Modification to Version](#8. Apply Modification to Version) for details.
+- `LogAndApply()` apply the `VersionEdit` object to current version. This function is also called during major compaction. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
 
 Note that the `LogAndApply()` does NOT interact with external stroage at all: it only apply those abstract objects `VersionEdit` and `Version`.
 
@@ -524,5 +524,101 @@ Compaction* VersionSet::PickCompaction() {
   SetupOtherInputs(c);
 
   return c;
+}
+```
+
+
+
+
+
+
+
+### 7. Merge Tables
+
+`DoCompactionWork` do the following works:
+
+- construct an iterator `input` from `FileMetaData*` in `Compaction` object.
+
+- Iterate the key value pair in `input` to build the `compact->builder`.
+
+  Note that some old and deleted data could be dropped.
+
+- Call `FinishCompactionOutputFile()` to write `sstable` file when the iteration is completed or key value buffers inside `compact->build` reaches one of the two thresholds:
+
+  - The file size reaches the limit `MaxOutputFileSize`.
+  - The overlap bytes with grandparent level reaches the limit `MaxGrandParentOverlapBytes`. This checking is done inside `compact->compaction->ShouldStopBefore(key)`.
+
+  The physical file writing work is done by invoking `compact->build->Finish()` inside `FinishCompactionOutputFile()`.
+
+- Call `InstallCompactionResults()` to call `LogAndApply()` to apply `compact->compaction->edit()` to current version. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
+
+```c++
+Status DBImpl::DoCompactionWork(CompactionState* compact) {
+  Iterator* input = versions_->MakeInputIterator(compact->compaction);
+  input->SeekToFirst();
+
+  ParsedInternalKey ikey;
+  std::string current_user_key;
+  bool has_current_user_key = false;
+  SequenceNumber last_sequence_for_key = kMaxSequenceNumber;
+
+  while (input->Valid()) {
+    if (imm_ != nullptr) CompactMemTable();
+    Slice key = input->key();
+    if (compact->compaction->ShouldStopBefore(key) &&
+        compact->builder != nullptr) {
+      FinishCompactionOuuputFile(compact, input);
+    }
+
+    // Handle key/value, add to state, etc.
+    bool drop = false;
+    ParseInternalKey(key, &ikey)
+    if (!has_current_user_key ||
+        user_comparator()->Compare(ikey.user_key, Slice(current_user_key)) != 0) {
+      // First occurrence of this user key
+      current_user_key.assign(ikey.user_key.data(), ikey.user_key.size());
+      has_current_user_key = true;
+      last_sequence_for_key = kMaxSequenceNumber;
+    }
+
+    if (last_sequence_for_key <= compact->smallest_snapshot) {
+      // Hidden by an newer entry for same user key
+      drop = true;  // (A)
+    } else if (ikey.type == kTypeDeletion &&
+               ikey.sequence <= compact->smallest_snapshot &&
+               compact->compaction->IsBaseLevelForKey(ikey.user_key)) {
+      // For this user key:
+      // (1) there is no data in higher levels
+      // (2) data in lower levels will have larger sequence numbers
+      // (3) data in layers that are being compacted here and have
+      //     smaller sequence numbers will be dropped in the next
+      //     few iterations of this loop (by rule (A) above).
+      // Therefore this deletion marker is obsolete and can be dropped.
+      drop = true;
+    }
+
+    last_sequence_for_key = ikey.sequence;
+
+    if (!drop) {
+      // Open output file if necessary
+      if (compact->builder == nullptr) {
+        OpenCompactionOutputFile(compact);
+      }
+      if (compact->builder->NumEntries() == 0) {
+        compact->current_output()->smallest.DecodeFrom(key);
+      }
+      compact->current_output()->largest.DecodeFrom(key);
+      compact->builder->Add(key, input->value());
+
+      // Close output file if it is big enough
+      if (compact->builder->FileSize() >= compact->compaction->MaxOutputFileSize()) {
+        FinishCompactionOutputFile(compact, input);
+      }
+    }
+    input->Next();
+  }
+
+	FinishCompactionOutputFile(compact, input);
+  InstallCompactionResults(compact);
 }
 ```
