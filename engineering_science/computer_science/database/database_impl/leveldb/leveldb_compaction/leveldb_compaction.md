@@ -178,7 +178,7 @@ Refer to [4. Minor Compaction](#4. Minor Compaction) for details of `CompactMemT
 otherwise we generate the compaction:
 
 - If the compaction is manually invoked, use `CompactRange()` to search for those `sstable` based on `level`, `begin`, `end` provided by user. Refer to [5. Search Tables in Given Range](#5. Search Tables in Given Range) for details of `CompactRange()`.
-- If the compaction is automatically inovked, use `PickCompaction()` to search for the best level to compact. Refer to [6. Pick Table to Compact](#6. Pick Table to Compact) for details of `PickCompaction()`.
+- If the compaction is automatically inovked, use `PickCompaction()` to search for the best level to compact. Refer to [6. Pick Tables to Compact](#6. Pick Tables to Compact) for details of `PickCompaction()`.
 
 ```c++
 Compaction* c;
@@ -403,7 +403,7 @@ Writing stuff is done inside `build->Finish()`.
 
 ### 5. Search Tables in Given Range
 
-`CompactRange` searches those `sstable` in given level which are overlapped with range `[begin, end]` by three steps:
+When the compaction is inovked manually, `CompactRange` searches those `sstable` in given level which are overlapped with range `[begin, end]` by three steps:
 
 1. `GetOverlappingInputs` to get the set of `sstable` which are overlapped with range `[begin, end]`, store them in `std::vector<FileMetaData*> inputs`.
 2. Reduce number of file to compact for levels ≥ 1. The limit is set to `max_file_size = 2 * 1024 * 1024`, which is configurable.
@@ -440,6 +440,89 @@ Compaction* VersionSet::CompactRange(int level, const InternalKey* begin,
   c->input_version_->Ref();
   c->inputs_[0] = inputs;
   SetupOtherInputs(c);
+  return c;
+}
+```
+
+
+
+
+
+
+
+### 6. Pick Tables to Compact
+
+When the compaction is invoked automatically, `PickCompaction` is called to determine which level and which file should be compact in the highest priority:
+
+As we've quantified in [3. Preconditions of Compaction](#3. Preconditions of Compaction), there are two trigger of compaction:
+
+- **Size Compaction**, when the total size of level (for level ≥ 1) or the total file number of level (for level-0) overflows.
+- **Seek Compaction**, when the seek quota of a file run outs.
+
+Between this two kinds of compaction `size_compaction` has the higher priority.
+
+Note that the compaction in specific level is **rotating**: `compact_pointer_[level]` memorizes the key where the range of last compaction ends, which is used as the start of this compaction.
+
+The implementation of level-0 compaction is different what the `doc/impl.md` file declare:
+
+```markdown
+When the number of young files exceeds a certain threshold (currently four), all of the young files are merged together with all of the overlapping level-1 files to produce a sequence of new level-1 files (we create a new level-1 file for every 2MB of data.)
+```
+
+Actually not all the young files are merged, but those overlapped with the rotating picked one.
+
+```c++
+Compaction* VersionSet::PickCompaction() {
+  Compaction* c;
+  int level;
+
+  // We prefer compactions triggered by too much data in a level over
+  // the compactions triggered by seeks.
+  const bool size_compaction = (current_->compaction_score_ >= 1);
+  const bool seek_compaction = (current_->file_to_compact_ != nullptr);
+  if (size_compaction) {
+    level = current_->compaction_level_;
+    assert(level >= 0);
+    assert(level + 1 < config::kNumLevels);
+    c = new Compaction(options_, level);
+
+    // Pick the first file that comes after compact_pointer_[level]
+    for (size_t i = 0; i < current_->files_[level].size(); i++) {
+      FileMetaData* f = current_->files_[level][i];
+      if (compact_pointer_[level].empty() ||
+          icmp_.Compare(f->largest.Encode(), compact_pointer_[level]) > 0) {
+        c->inputs_[0].push_back(f);
+        break;
+      }
+    }
+    if (c->inputs_[0].empty()) {
+      // Wrap-around to the beginning of the key space
+      c->inputs_[0].push_back(current_->files_[level][0]);
+    }
+  } else if (seek_compaction) {
+    level = current_->file_to_compact_level_;
+    c = new Compaction(options_, level);
+    c->inputs_[0].push_back(current_->file_to_compact_);
+  } else {
+    return nullptr;
+  }
+
+  c->input_version_ = current_;
+  c->input_version_->Ref();
+
+  // Files in level 0 may overlap each other, so pick up all overlapping ones
+  if (level == 0) {
+    InternalKey smallest, largest;
+    GetRange(c->inputs_[0], &smallest, &largest);
+    // Note that the next call will discard the file we placed in
+    // c->inputs_[0] earlier and replace it with an overlapping set
+    // which will include the picked file.
+    current_->GetOverlappingInputs(0, &smallest, &largest, &c->inputs_[0]);
+    assert(!c->inputs_[0].empty());
+  }
+
+  SetupOtherInputs(c);
+
   return c;
 }
 ```
