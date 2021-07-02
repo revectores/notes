@@ -66,7 +66,7 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key,
 
 ##### # `MemTable::Get`
 
-`MemTable::Get` gets key from memtable. The searching work is done by `Table::Iterator::Seek()`. The main work it is done is validating whether the retrived key is indeed the key user provided, and then make proper action based on the `tag` of entry:
+`MemTable::Get` gets key from memtable. The searching work is done by `Table::Iterator::Seek()`, which is a `skiplist` operation. The main work it is done is validating whether the retrived key is indeed the key user provided, and then make proper action based on the `tag` of entry:
 
 - Set `value` for `kTypeValue`.
 - Set status to `NotFound` for `kTypeDeletion`.
@@ -108,6 +108,98 @@ bool MemTable::Get(const LookupKey& key, std::string* value, Status* s) {
     }
   }
   return false;
+}
+```
+
+
+
+##### # `Version::Get`
+
+`Version::Get` is basically a container of `struct State` definition. The core work is done in `ForEachOverlapping()` and `TableCache::Get()` inside callback function `State::Match`:
+
+- `ForEachOverlapping(Slice user_key, Slice internal_key, void* arg, bool (*func)(void*, int, FileMetaData*))` calls `func(arg, level, f)` for every file that overlaps `user_key` in order from newest to oldest. If an invocation of `func` returns false, makes no more calls.
+
+- `TableCache::Get(const ReadOptions& options, uint64_t file_number, uint64_t file_size, const Slice& k, void* arg, void (*handle_result)(void*, const Slice&, const Slice&))` calls `(*handle_result)(arg, found_key, found_value)` if a seek to internal key `k` in specified file finds an entry. File reading is exectued in this phase (in the subroutine `FindTable()`, to be specific).
+
+  Specifically, here the callback function `SaveValue(void* arg, const Slice& ikey, const Slice& v)` receives the `struct Saver` as `arg` to fill the `key/value` pair to `state`.
+
+```c++
+Status Version::Get(const ReadOptions& options, const LookupKey& k,
+                    std::string* value, GetStats* stats) {
+  stats->seek_file = nullptr;
+  stats->seek_file_level = -1;
+
+  struct State {
+    Saver saver;
+    GetStats* stats;
+    const ReadOptions* options;
+    Slice ikey;
+    FileMetaData* last_file_read;
+    int last_file_read_level;
+
+    VersionSet* vset;
+    Status s;
+    bool found;
+
+    static bool Match(void* arg, int level, FileMetaData* f) {
+      State* state = reinterpret_cast<State*>(arg);
+
+      if (state->stats->seek_file == nullptr &&
+          state->last_file_read != nullptr) {
+        // We have had more than one seek for this read.  Charge the 1st file.
+        state->stats->seek_file = state->last_file_read;
+        state->stats->seek_file_level = state->last_file_read_level;
+      }
+
+      state->last_file_read = f;
+      state->last_file_read_level = level;
+
+      state->s = state->vset->table_cache_->Get(*state->options, f->number,
+                                                f->file_size, state->ikey,
+                                                &state->saver, SaveValue);
+      if (!state->s.ok()) {
+        state->found = true;
+        return false;
+      }
+      switch (state->saver.state) {
+        case kNotFound:
+          return true;  // Keep searching in other files
+        case kFound:
+          state->found = true;
+          return false;
+        case kDeleted:
+          return false;
+        case kCorrupt:
+          state->s =
+              Status::Corruption("corrupted key for ", state->saver.user_key);
+          state->found = true;
+          return false;
+      }
+
+      // Not reached. Added to avoid false compilation warnings of
+      // "control reaches end of non-void function".
+      return false;
+    }
+  };
+
+  State state;
+  state.found = false;
+  state.stats = stats;
+  state.last_file_read = nullptr;
+  state.last_file_read_level = -1;
+
+  state.options = &options;
+  state.ikey = k.internal_key();
+  state.vset = vset_;
+
+  state.saver.state = kNotFound;
+  state.saver.ucmp = vset_->icmp_.user_comparator();
+  state.saver.user_key = k.user_key();
+  state.saver.value = value;
+
+  ForEachOverlapping(state.saver.user_key, state.ikey, &state, &State::Match);
+
+  return state.found ? state.s : Status::NotFound(Slice());
 }
 ```
 
