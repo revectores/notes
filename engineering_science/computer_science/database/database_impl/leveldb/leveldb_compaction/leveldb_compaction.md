@@ -4,9 +4,20 @@
 
 ##### # `Version`
 
-To avoid incidential disabling data access (i.e. during an iteration) caused by compaction, version system is designed and embedded to the compaction module.
+To avoid disabling data access incidentially caused by compaction (i.e. during an iteration), version system is designed and embedded to the compaction module.
 
-A `Version` snapshots database by maintaining list of files per level in `files[config::kNumLevels]`:
+A `Version` is a snapshot of database maintaining list of files' metadata in `files[config::kNumLevels]`:
+
+`Version` object, as well as `FileMetaData`, use reference conuting to track whether itself (version/file) is active. `sstable` delection caused by compaction is deferred until the reference counting of the corresponding `FileMetaData` decreases to 0, this become true iff all versions points to it become inactive.
+
+In addition to the file metadata and reference counting there are some other types of member, summarized below:
+
+|                            Member                            |                        Interpretation                        |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+|                           `files_`                           |               `sstable` list for that version                |
+|                           `refs_`                            |                      reference counting                      |
+|                  `vset_`, `next_`, `prev_`                   |            `VersionSet` doubly-link list support             |
+| `file_to_compact_`, `file_to_comapct_level`, `compaction_score`, `compaction_level_` | Score and pointer used for size compaction and seek compaction |
 
 ```{.c++ filename="db/version_set.h"}
 class Version {
@@ -31,7 +42,40 @@ private:
 };
 ```
 
-`Version` object, as well as `FileMetaData`, use reference conuting to track whether the object is active. `sstable` delection raised by compaction is deferred until the reference counting of the corresponding `FileMetaData` decreases to 0, this become true iff all versions points to it become inactive.
+A new `Version` can be constructed from a `VersionSet`, and it will regard itself as the only version in the `VersionSet` (`next_(this)`, `prev_(this)`):
+
+```c++
+  explicit Version(VersionSet* vset)
+      : vset_(vset),
+        next_(this),
+        prev_(this),
+        refs_(0),
+        file_to_compact_(nullptr),
+        file_to_compact_level_(-1),
+        compaction_score_(-1),
+        compaction_level_(-1) {}
+```
+
+but this is only an temporary illusion: there may be other existed doubly-link list, and usually the new version will be added to that list later by `VersionSet::AppendVersion(Version* v)`:
+
+```c++
+void VersionSet::AppendVersion(Version* v) {
+  // Make "v" current
+  assert(v->refs_ == 0);
+  assert(v != current_);
+  if (current_ != nullptr) {
+    current_->Unref();
+  }
+  current_ = v;
+  v->Ref();
+
+  // Append to linked list
+  v->prev_ = dummy_versions_.prev_;
+  v->next_ = &dummy_versions_;
+  v->prev_->next_ = v;
+  v->next_->prev_ = v;
+}
+```
 
 
 
@@ -812,3 +856,4 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
   prev_log_number_ = edit->prev_log_number_;
 }
 ```
+
