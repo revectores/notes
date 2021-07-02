@@ -234,7 +234,7 @@ if (c == nullptr) {
 }
 ```
 
-The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Refer to [7. Merge Tables](#7. Merge Tables) for details of `DoCompactionWork()`. Inside it `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current `version`. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
+The magic part is `DoCompactionWork()`: It merge all `sstable` in `inputs_[2]` based on merge sort. Refer to [7. Merge Tables](#7. Merge Tables) for details of `DoCompactionWork()`. Inside it `InstallCompactionResults()` is invoked where `LogAndApply()` is finally to executed to apply the `VersionEdit` to current `version`. Refer to [8. Apply and Log VersionEdit](#8. Apply and Log VersionEdit) for details.
 
 
 
@@ -351,7 +351,7 @@ which keeps the `file_to_compact_` and `file_to_compact_level_` up-to-date.
 Minor compaction is done by method `CompactMemTable()`. Here the two invocation `WriteLevel0Table()` and `LogAndApply()` are the core:
 
 - `WriteLevel0Table()` **write** `sstable` file and returns `VersionEdit` object.
-- `LogAndApply()` apply the `VersionEdit` object to current version. This function is also called during major compaction. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
+- `LogAndApply()` apply the `VersionEdit` object to current version. This function is also called during major compaction. Refer to [8. Apply and Log VersionEdit](#8. Apply and Log VersionEdit) for details.
 
 Note that the `LogAndApply()` does NOT interact with external stroage at all: it only apply those abstract objects `VersionEdit` and `Version`.
 
@@ -537,7 +537,7 @@ Compaction* VersionSet::PickCompaction() {
 
 `DoCompactionWork` do the following works:
 
-- construct an iterator `input` from `FileMetaData*` in `Compaction` object.
+- Construct an iterator `input` from `FileMetaData*` in `Compaction` object.
 
 - Iterate the key value pair in `input` to build the `compact->builder`.
 
@@ -550,7 +550,7 @@ Compaction* VersionSet::PickCompaction() {
 
   The physical file writing work is done by invoking `compact->build->Finish()` inside `FinishCompactionOutputFile()`.
 
-- Call `InstallCompactionResults()` to call `LogAndApply()` to apply `compact->compaction->edit()` to current version. Refer to [8. Apply VersionEdit to Version](#8. Apply VersionEdit to Version) for details.
+- Call `InstallCompactionResults()` to call `LogAndApply()` to apply `compact->compaction->edit()` to current version. Refer to [8. Apply and Log VersionEdit](#8. Apply and Log VersionEdit) for details.
 
 ```c++
 Status DBImpl::DoCompactionWork(CompactionState* compact) {
@@ -620,5 +620,195 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
 
 	FinishCompactionOutputFile(compact, input);
   InstallCompactionResults(compact);
+}
+```
+
+
+
+
+
+
+
+### 8. Apply and Log VersionEdit
+
+##### # `VersionSet::LogAndApply`
+
+Two responsibility of `VersionSert::LogAndApply`:
+
+- Create a new version by applying `VersionEdit` to current version.
+- Append records to `MANIFEST`.
+
+The `VersionEdit` applying is done with the help of `VersionSet::Builder`:
+
+```c++
+Version* v = new Version(this);
+{
+	Builder builder(this, current_);
+	builder.Apply(edit);
+	builder.SaveTo(v);
+}
+Finalize(v);
+```
+
+where
+
+- `VersionSet::Builder::Apply` consumes information provided in `edit` to make up necessary member variables of `Builder`. No interaction with the base version `base_`.
+- `VersionSet::Builder::SaveTo` actually "apply" consumed information to base version `base_` and made the new version `v`.
+- `VersionSet::Finalize` compute `compaction_level_` and `compaction_score_` for the next compaction.
+
+
+
+##### # `VersionSet::Builder:Apply`
+
+`VersionSet::Builder::Apply` convert paired-structured information provided in `VersionEdit` into level-indexed information in `Version::Builder`. Specifically:
+
+|                      `VersionEdit` data                      |                `Version::Builder` data                |
+| :----------------------------------------------------------: | :---------------------------------------------------: |
+| `std::vector<std::pair<int, InternalKey>> compact_pointers_` |   `std::string compact_pointer[config::kNumLevels]`   |
+|     `std::set<std::pair<int, uint64_t>> deleted_files_`      |          `std::set<uint64_t> deleted_files`           |
+|    `std::vector<std::pair<int, FileMetaData>> new_files_`    | `std::set<FileMetaData*, BySmallestKey>* added_files` |
+
+Convertion of `compact_pointer(s)` and `deleted_files` are trivial (and maybe optimizable). Creating new `FileMetaData` when converting `new_files_` to `add_files` seems to be a waste but not so much since `FileMetaData` is a simple `struct` (with two `InternalKey` though).
+
+```c++
+void Apply(VersionEdit* edit) {
+  // Update compaction pointers
+  for (size_t i = 0; i < edit->compact_pointers_.size(); i++) {
+    const int level = edit->compact_pointers_[i].first;
+    vset_->compact_pointer_[level] =
+      edit->compact_pointers_[i].second.Encode().ToString();
+  }
+
+  // Delete files
+  for (const auto& deleted_file_set_kvp : edit->deleted_files_) {
+    const int level = deleted_file_set_kvp.first;
+    const uint64_t number = deleted_file_set_kvp.second;
+    levels_[level].deleted_files.insert(number);
+  }
+
+  // Add new files
+  for (size_t i = 0; i < edit->new_files_.size(); i++) {
+    const int level = edit->new_files_[i].first;
+    FileMetaData* f = new FileMetaData(edit->new_files_[i].second);
+    f->refs = 1;
+
+    // We arrange to automatically compact this file after
+    // a certain number of seeks.  Let's assume:
+    //   (1) One seek costs 10ms
+    //   (2) Writing or reading 1MB costs 10ms (100MB/s)
+    //   (3) A compaction of 1MB does 25MB of IO:
+    //         1MB read from this level
+    //         10-12MB read from next level (boundaries may be misaligned)
+    //         10-12MB written to next level
+    // This implies that 25 seeks cost the same as the compaction
+    // of 1MB of data.  I.e., one seek costs approximately the
+    // same as the compaction of 40KB of data.  We are a little
+    // conservative and allow approximately one seek for every 16KB
+    // of data before triggering a compaction.
+    f->allowed_seeks = static_cast<int>((f->file_size / 16384U));
+    if (f->allowed_seeks < 100) f->allowed_seeks = 100;
+
+    levels_[level].deleted_files.erase(f->number);
+    levels_[level].added_files->insert(f);
+  }
+}
+```
+
+The design and quantization of `allowed_seeks` is provided in the comments above.
+
+
+
+##### # `VersionSet::Builder::SaveTo`
+
+Now the real solid work: `Version` construction! The core idea is simple: iterate `base_files` and `added_files` to collect all `FileMetaData` which are not `deleted` (that is, not shown in `deleted_files`). The implementation is a bit more confusing since each level in `std::vector<FileMetaData*> files_[config::kNumLevels]` in `Version` is required to be ordered.
+
+```c++
+void SaveTo(Version* v) {
+  BySmallestKey cmp;
+  cmp.internal_comparator = &vset_->icmp_;
+  for (int level = 0; level < config::kNumLevels; level++) {
+    // Merge the set of added files with the set of pre-existing files.
+    // Drop any deleted files.  Store the result in *v.
+    const std::vector<FileMetaData*>& base_files = base_->files_[level];
+    std::vector<FileMetaData*>::const_iterator base_iter = base_files.begin();
+    std::vector<FileMetaData*>::const_iterator base_end = base_files.end();
+    const FileSet* added_files = levels_[level].added_files;
+    v->files_[level].reserve(base_files.size() + added_files->size());
+    for (const auto& added_file : *added_files) {
+      // Add all smaller files listed in base_
+      for (std::vector<FileMetaData*>::const_iterator bpos =
+           std::upper_bound(base_iter, base_end, added_file, cmp);
+           base_iter != bpos; ++base_iter) {
+        MaybeAddFile(v, level, *base_iter);
+      }
+
+      MaybeAddFile(v, level, added_file);
+    }
+
+    // Add remaining base files
+    for (; base_iter != base_end; ++base_iter) {
+      MaybeAddFile(v, level, *base_iter);
+    }
+  }
+}
+
+void MaybeAddFile(Version* v, int level, FileMetaData* f) {
+  if (levels_[level].deleted_files.count(f->number) > 0) {
+    // File is deleted: do nothing
+  } else {
+    std::vector<FileMetaData*>* files = &v->files_[level];
+    if (level > 0 && !files->empty()) {
+      // Must not overlap
+      assert(vset_->icmp_.Compare((*files)[files->size() - 1]->largest,
+                                  f->smallest) < 0);
+    }
+    f->refs++;
+    files->push_back(f);
+  }
+}
+```
+
+
+
+##### # Append New Records to `MANIFEST`
+
+After the version applying work, we write `VersionEdit` to `MANIFEST` (note that since `MANIFEST` file is formatted as a log, hence we write the incremental `VersionEdit` instead of entire `Version`). If the `MANIFEST` file `descriptor_log_` does not avaliable, we create one.
+
+```c++
+Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
+	// [Apply VersionEdit to Version]
+
+  // Initialize new descriptor log file if necessary by creating
+  // a temporary file that contains a snapshot of the current version.
+  std::string new_manifest_file;
+  Status s;
+  if (descriptor_log_ == nullptr) {
+    // No reason to unlock *mu here since we only hit this path in the
+    // first call to LogAndApply (when opening the database).
+    new_manifest_file = DescriptorFileName(dbname_, manifest_file_number_);
+    edit->SetNextFile(next_file_number_);
+    env_->NewWritableFile(new_manifest_file, &descriptor_file_);
+    descriptor_log_ = new log::Writer(descriptor_file_);
+    WriteSnapshot(descriptor_log_);
+  }
+
+  {
+    // Write new record to MANIFEST log
+    std::string record;
+    edit->EncodeTo(&record);
+    descriptor_log_->AddRecord(record);
+    descriptor_file_->Sync();
+
+    // If we just created a new descriptor file, install it by writing a
+    // new CURRENT file that points to it.
+    if (!new_manifest_file.empty()) {
+      s = SetCurrentFile(env_, dbname_, manifest_file_number_);
+    }
+  }
+
+  // Install the new version
+  AppendVersion(v);
+  log_number_ = edit->log_number_;
+  prev_log_number_ = edit->prev_log_number_;
 }
 ```
