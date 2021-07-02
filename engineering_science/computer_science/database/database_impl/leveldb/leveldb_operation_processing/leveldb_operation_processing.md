@@ -62,3 +62,52 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key,
 }
 ```
 
+
+
+##### # `MemTable::Get`
+
+`MemTable::Get` gets key from memtable. The searching work is done by `Table::Iterator::Seek()`. The main work it is done is validating whether the retrived key is indeed the key user provided, and then make proper action based on the `tag` of entry:
+
+- Set `value` for `kTypeValue`.
+- Set status to `NotFound` for `kTypeDeletion`.
+
+In detail, since the length of key and value are encoded in [`varint`](), utils such as `GetVarint32Ptr` is invoked (`GetlengthPrefixedSlice` is a simple wrapper of `GetVarint32Ptr`).
+
+```c++
+bool MemTable::Get(const LookupKey& key, std::string* value, Status* s) {
+  Slice memkey = key.memtable_key();
+  Table::Iterator iter(&table_);
+  iter.Seek(memkey.data());
+  if (iter.Valid()) {
+    // entry format is:
+    //    klength  varint32
+    //    userkey  char[klength]
+    //    tag      uint64
+    //    vlength  varint32
+    //    value    char[vlength]
+    // Check that it belongs to same user key.  We do not check the
+    // sequence number since the Seek() call above should have skipped
+    // all entries with overly large sequence numbers.
+    const char* entry = iter.key();
+    uint32_t key_length;
+    const char* key_ptr = GetVarint32Ptr(entry, entry + 5, &key_length);
+    if (comparator_.comparator.user_comparator()->Compare(
+            Slice(key_ptr, key_length - 8), key.user_key()) == 0) {
+      // Correct user key
+      const uint64_t tag = DecodeFixed64(key_ptr + key_length - 8);
+      switch (static_cast<ValueType>(tag & 0xff)) {
+        case kTypeValue: {
+          Slice v = GetLengthPrefixedSlice(key_ptr + key_length);
+          value->assign(v.data(), v.size());
+          return true;
+        }
+        case kTypeDeletion:
+          *s = Status::NotFound(Slice());
+          return true;
+      }
+    }
+  }
+  return false;
+}
+```
+
