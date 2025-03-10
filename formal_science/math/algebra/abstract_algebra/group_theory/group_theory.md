@@ -8,7 +8,11 @@ $$
 
 ##### Definition
 
-A non-empty set $S$ with its **combinative** binary operation called **SemiGroup**. If there's identical element in semigroup, it's a **Monoid**. Monoid with all the elements reversible is a **Group**.
+A non-empty set $S$ with its **combinative** binary operation called **Semigroup**.
+
+If there is an identical element in semigroup, it's a **Monoid**.
+
+Monoid with all the elements reversible is a **Group**.
 
 The subset $M^{\times}$ which contains all the reversible elements of a monoid $M$ construct a group, which is defined as the **Unit Group** of $M$.
 
@@ -238,7 +242,6 @@ Although its tedious and hard to prove the subgroup in general group, while for 
 
 
 ### 3. Cyclic Group
-
 
 
 

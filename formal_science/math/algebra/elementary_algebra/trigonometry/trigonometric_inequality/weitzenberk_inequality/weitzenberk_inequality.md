@@ -53,4 +53,3 @@ $$
 > $$
 > 这个加强被称为Finsler-Hadwiger不等式.
 
-

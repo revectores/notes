@@ -6,17 +6,17 @@
 
 ##### # Markov Chain
 
-The **(First-Order) Markov chain** embodies the **Markov assumption** which states that each state only depends on the last state on a state sequence, in other words, to predict the future, the past doesn't matter, only the present.
+The **(First-Order) Markov chain** embodies the **Markov assumption** which states that each state only depends on the previous state on a state sequence, in other words, to predict the future, the past doesn't matter, only the present.
 
 Formally, the Markov assumption reduces the condition in the conditional probability expression:
 $$
 P(q_i = a \mid q_1q_2\ldots q_{i-1}) = P(q_i = a \mid q_{i-1})
 $$
-Formally, a Markov chain is specified by three components:
+A Markov chain is specified by three components:
 
 1. **Set of $N$ states**. $Q = \{q_1, q_2, \ldots, q_N\}$.
 
-2. **Transition probability matrix** $A = \{a_{ij}\}, 1\le i, j\le n$. $a_{ij}$ represents the probability moving from state $i$ to state $j$. s.t.
+2. **Transition probability matrix** $A = \{a_{ij}\}, 1\le i, j\le n$, where $a_{ij}$ is the probability moving from state $i$ to state $j$. s.t.
     $$
     a_{ij} \ge 0, \quad \sum_{j=1}^N a_{ij} = 1
     $$
@@ -25,8 +25,10 @@ Formally, a Markov chain is specified by three components:
     $$
     \pi_i \ge 0, \quad \sum_{i=1}^n \pi_i = 1
     $$
+    
+4. 
 
-The markov chain can be described as [undetermined finite state machine](), with probability on the arcs:
+The markov chain can be described as an [undetermined finite state machine](), with probability on the arcs:
 
 ==TODO: Draw undetermined FSM to represent an instance of markov chain.==
 

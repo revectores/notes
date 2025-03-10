@@ -1,0 +1,68 @@
+<!-- Save as diagram.svg -->
+<svg width="300" height="300"
+     viewBox="0 0 300 300"
+     xmlns="http://www.w3.org/2000/svg"
+     style="background:#fff">
+
+  <!-- Define a reusable arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Node 1 at (80,80) -->
+  <circle cx="80" cy="80" r="20" fill="white" stroke="black" stroke-width="2" />
+  <text x="80" y="85" font-size="18" text-anchor="middle" fill="black">1</text>
+
+  <!-- Node 2 at (80,200) -->
+  <circle cx="80" cy="200" r="20" fill="white" stroke="black" stroke-width="2" />
+  <text x="80" y="205" font-size="18" text-anchor="middle" fill="black">2</text>
+
+  <!-- Node 3 at (200,200) -->
+  <circle cx="200" cy="200" r="20" fill="white" stroke="black" stroke-width="2" />
+  <text x="200" y="205" font-size="18" text-anchor="middle" fill="black">3</text>
+
+  <!-- Node 4 at (200,80) -->
+  <circle cx="200" cy="80" r="20" fill="white" stroke="black" stroke-width="2" />
+  <text x="200" y="85" font-size="18" text-anchor="middle" fill="black">4</text>
+
+  <!-- Edges with arrowheads (marker-end="url(#arrow)") -->
+
+  <!-- 1 -> 2 -->
+  <line x1="80" y1="100" x2="80" y2="180"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 2 -> 1 -->
+  <line x1="80" y1="180" x2="80" y2="100"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 1 -> 4 -->
+  <line x1="100" y1="80" x2="180" y2="80"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 4 -> 1 -->
+  <line x1="180" y1="80" x2="100" y2="80"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 1 -> 3 (diagonal) -->
+  <line x1="95" y1="95" x2="185" y2="185"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 4 -> 3 (vertical) -->
+  <line x1="200" y1="100" x2="200" y2="180"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+  <!-- 3 -> 2 (horizontal) -->
+  <line x1="180" y1="200" x2="100" y2="200"
+        stroke="black" stroke-width="2"
+        marker-end="url(#arrow)" />
+
+</svg>

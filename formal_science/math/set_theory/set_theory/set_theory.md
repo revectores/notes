@@ -12,8 +12,6 @@ $$
 
 ##### # Relation between set and element
 
-A 
-
 In relation's persepective, **subset relation** between sets is dreflective, anti-symmetric, and transtive.
 
 
@@ -132,7 +130,6 @@ For any set $A$, $|A| < |P(A)|$.
 > $$
 > S = \{x\ |\ x\in A, x\notin S\}
 > $$
-> 
 
 There exists the proper subset of infinite set which cardinal with the infinite set itself, while it's impossible for finite set. This property can be used to **DEFINE** infinite set.
 
@@ -147,7 +144,6 @@ $$
 0,\ 1,\ 2,\ ...,\ n,\ ...,\ \aleph_0,\ \aleph_1,\ \aleph_2,\ ...,\ \aleph_n,\ ...
 $$
 where $\aleph_0$ is the **Smallest** infinite cardnials which represents the cardnials of $\mathbb{N}$.
-
 
 
 

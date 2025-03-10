@@ -1,0 +1,54 @@
+Workload-Aware Hybrid Storage Design
+
+# Workload-Aware Dynamic LSM-Tree
+Monkey: Optimal Navigable Key-Value Store, Idreos16
+为LSM-Tree顶层分配更多的布隆过滤器能够大幅度提升读性能.
+
+Dostoevsky: Better Space-Time Trade-Offs for LSM-Tree Based Key-Value Stores via Adaptive Removal of Superfluous Merging, Idreos18
+由于Monkey注意到不均匀的布隆过滤器分配(给上层过滤器更多的内存)能够有效提升查询性能, 从而为读性能带来了较大提升, 本文认为可以去除上层的merge操作, 只在最底层保留(实际上可以认为是上层tiering底层leveling), 命名为Lazy Leveling, 在借助大量的上层BF避免读(点查询, 长程范围查询, 空间放大)性能劣化的基础上降低了写开销.
+
+Design Continuums and the Path Toward Self-Designing Key-Value Stores that Know and Learn, Idreos19
+
+The Log-Structured Merge-Bush & the Wacky Continuum, Idreos19
+
+Learning to Optimize LSM-trees: Towards A Reinforcement Learning based Key-Value Store for Dynamic Workloads. NTU23
+RUSKEY应用强化学习基于负载在线动态修改LSM-Tree各层的压缩策略. 设计了新的FLSM-Tree结构以适应压缩策略的在线动态变化.
+强化学习建模. 各层压缩策略独立(K1, K2, ..., KL), action是压缩策略向量的更新(2^L), 考虑到在线架构应当具备连续性限制单步的action为单一分量的自增/自减操作(L). reward是端到端延迟和本层延迟的线性组合.
+各层之间的压缩策略传播. 根据各层布隆过滤器是否均匀配置(bit per key是否一致), 分为均匀模式和Monkey模式两类考虑, 对于均匀模式则认为各层的读写特性一致, 只调整第一层的压缩策略K观察反馈并向其他各层传播, 对于Monkey模式本文通过计算表示i - 1, i层的K决定了最优的i + 1层的K, 从而允许压缩策略自上而下的传播.
+适应于动态压缩策略的新结构FLSM-Tree. 实际上就是老人老办法新人新办法.
+
+Structural Designs Meet Optimality: Exploring Optimized LSM-tree Structures in A Colossal Configuration Space, NTU24
+解析地分析io开销以计算出最优化的LSM-Tree参数.
+
+Endure: A Robust Tuning Paradigm for LSM Trees Under Workload Uncertainty, BU22
+考虑了自适应负载LSM-Tree调参的稳健型问题. 鉴于未来负载本质上的不确定性, 若只考虑一个单点, 当实际负载同预期之间存在偏移时可能导致预期之外的性能劣化, 因此应当考虑一个不确定的负载邻域, 最优化最坏情况下的性能.
+使用KL散度定义两个概率分布之间的距离.
+
+
+
+# Hybrid LSM-Tree and Other Structures
+Jungle - Towards Dynamically Adjustable Key-Value Store by Combining LSM-Tree and Copy-On-Write B+-Tree, eBay, USENIX HotStorage19
+对于垂直分组的tiering LSM-Tree, 将组内的数据结构从多个有序数组改为CoW B+Tree以在保持查询开销的同时降低写开销.
+
+An LSM Tree Augmented with B+ Tree on Nonvolatile Memory, Samsung, TOS24
+在NVM里维护两棵B+树以内存化插入和顶层compaction过程.
+
+
+
+# Evolving Data Structure
+E-Tree: An Ever Evolving Tree for Evolving Workloads, Harvard17
+
+LSM-Trees and B-Trees - The Best of Both Worlds, Harvard19
+给出LSM-Tree和B-Tree之间相互转换的方式
+在此基础上给出动态调整K的机制, 允许最后一层更少的merge以优化写性能, 或上层更多的merge以优化短程范围查询性能.
+
+
+
+# Learned Storage Engine
+Cosine: A Cloud-Cost Optimized Self-Designing Key-Value Storage Engine, Idreos22
+
+Limousine: Blending Learned and Classical Indexes to Self-Design Larger-than-Memory Cloud Storage Engines, Idreos24
+
+# General LSM-Tree Optimization
+
+

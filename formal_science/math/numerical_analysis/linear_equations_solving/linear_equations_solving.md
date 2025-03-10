@@ -513,4 +513,3 @@ The iteration is called
 
 The best $\omega$ (with fastest convergence speed) is hard to determine for specific equation.
 
-
